@@ -10,8 +10,9 @@ public class PlayerPathing : MonoBehaviour
 
     public Tile start;
     bool pathing;
-    Tile hitTile;
+    public Tile hitTile;
     Vector3 pos;
+    bool canmove;
 
 
     List<Tile> closed;
@@ -60,25 +61,28 @@ public class PlayerPathing : MonoBehaviour
         MapCreated = true;
         Action find = () =>
         {
-            mapobj = GameObject.FindGameObjectWithTag("MapGen").GetComponent<MapGen>();
+            mapobj = FindObjectOfType<MapGen>();
             player = transform;
             pos = player.position;
-            cursortran = Instantiate(cursor, new Vector3(pos.x, .3f, pos.z), Quaternion.identity).transform;
+            cursortran = Instantiate(cursor, new Vector3(pos.x, .3f, pos.z), Quaternion.Euler(90, 0, 0)).transform;
             cursorpos = new Vector2(cursortran.position.x, cursortran.position.z);
+            Debug.Log("Player Assigned");
         };
         ThreadQueue.QueueAction(find);
 
         Thread.Sleep(10);
+
         ThreadQueue.StartThreadFunction(FindRange);
 
 
 
-        
+
     }
 
     void CheckTile()
     {
         hitTile = mapobj.map[(int)cursorpos.x, (int)cursorpos.y];
+
         if (hitTile.walkable && inRange.Contains(hitTile))
         {
 
@@ -97,25 +101,31 @@ public class PlayerPathing : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.UpArrow))
             {
                 cursorpos.y += 1;
-                CheckTile();
+                if (!pathing)
+                    CheckTile();
             }
 
             if (Input.GetKeyDown(KeyCode.DownArrow))
             {
                 cursorpos.y -= 1;
-                CheckTile();
+
+                if (!pathing)
+                    CheckTile();
+
             }
 
             if (Input.GetKeyDown(KeyCode.RightArrow))
             {
                 cursorpos.x += 1;
-                CheckTile();
+                if (!pathing)
+                    CheckTile();
             }
 
             if (Input.GetKeyDown(KeyCode.LeftArrow))
             {
                 cursorpos.x -= 1;
-                CheckTile();
+                if (!pathing)
+                    CheckTile();
             }
 
 
@@ -132,7 +142,10 @@ public class PlayerPathing : MonoBehaviour
     void Update()
     {
 
+
         CursorInput();
+
+        canmove = !pathing;
 
 
         if (Input.GetKeyDown(KeyCode.Z) && closed != null && !pathing)
@@ -554,7 +567,7 @@ public class PlayerPathing : MonoBehaviour
             {
                 pathObjs.Add(Instantiate(path, new Vector3(xpos, .05f, ypos), Quaternion.identity));
             };
-            
+
             ThreadQueue.QueueAction(func);
         }
     }

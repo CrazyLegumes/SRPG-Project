@@ -7,7 +7,7 @@ Material:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: Range
-  m_Shader: {fileID: 4800000, guid: 4fdc074ccf733734fad3621d9a029aef, type: 3}
+  m_Shader: {fileID: 4800000, guid: ea1e2318cb488b5418373025b03555b0, type: 3}
   m_ShaderKeywords: _ALPHABLEND_ON _DISTORT_ON _EMISSION
   m_LightmapFlags: 1
   m_CustomRenderQueue: -1
@@ -18,7 +18,7 @@ Material:
     - first:
         name: Texture
       second:
-        m_Texture: {fileID: 10904, guid: 0000000000000000f000000000000000, type: 0}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 0.9, y: 0.9}
         m_Offset: {x: 0, y: 0}
     - first:

@@ -37,9 +37,9 @@
 	float4 frag(v2f i) : SV_Target{
 
 		float4 color = tex2D(Texture, i.uv);
-		color.r = .5;
-		color.g = .2;
-		color.b = .2;
+		color.r = .2;
+		color.g = .8;
+		color.b = .8;
 		color.a = abs(sin(_Time[1] * 2));
 		
 		return color;

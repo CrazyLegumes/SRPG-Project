@@ -114,11 +114,21 @@ MonoBehaviour:
     h: 0
     cost: 0
     position: {x: 0, y: 0}
-  path: {fileID: 0}
+  hitTile:
+    walkable: 0
+    start: 0
+    x: 0
+    y: 0
+    f: 0
+    g: 0
+    h: 0
+    cost: 0
+    position: {x: 0, y: 0}
+  path: {fileID: 1522176267408974, guid: 62d4009407ad47d47a98b15487b4ad4d, type: 2}
   cursor: {fileID: 1925642757120890, guid: 38681e6ef6f25964bb541d6dbe3eff3b, type: 2}
   myRange: {fileID: 1599329209663054, guid: 04c8b322d988bcc42aa51b03a2c8cabd, type: 2}
   player: {fileID: 0}
   cursortran: {fileID: 0}
   cursorpos: {x: 0, y: 0}
-  range: 0
+  range: 5
   mapobj: {fileID: 0}
