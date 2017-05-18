@@ -22,6 +22,8 @@ GameObject:
   - component: {fileID: 33760229278842566}
   - component: {fileID: 64200912974416820}
   - component: {fileID: 23197029108242924}
+  - component: {fileID: 114031956140267570}
+  - component: {fileID: 65119419591806128}
   m_Layer: 0
   m_Name: Cursor01
   m_TagString: Untagged
@@ -94,3 +96,30 @@ MeshCollider:
   m_InflateMesh: 0
   m_SkinWidth: 0.01
   m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!65 &65119419591806128
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1925642757120890}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.8, y: 0.8, z: 0.5}
+  m_Center: {x: 0, y: 0, z: -0.25}
+--- !u!114 &114031956140267570
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1925642757120890}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3e9cbd1576ae3845b2621af46ea53d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cursor: {fileID: 0}
+  canMove: 0
+  cursorpos: {x: 0, y: 0, z: 0}
+  highlighted: {fileID: 0}

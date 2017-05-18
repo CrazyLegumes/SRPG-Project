@@ -53,7 +53,7 @@ public class MapGen : MonoBehaviour
     public static int MAPX, MAPY;
 
     [SerializeField]
-    GameObject tile, startTile, wall, cursor;
+    GameObject tile, startTile, wall, player1, player2;
 
 
     public Tile start;
@@ -154,7 +154,12 @@ public class MapGen : MonoBehaviour
             {
                 Debug.LogFormat("X is {0}, Y is {1}", start.x, start.y);
                 int l = start.x; int m = start.y;
-                Instantiate(cursor, new Vector3(l, 0, m), Quaternion.Euler(90,0,0));
+                Instantiate(player1, new Vector3(l, .5f, m), Quaternion.Euler(90,0,0));
+                int randx = UnityEngine.Random.Range(1, MAPX);
+                int randy = UnityEngine.Random.Range(1, MAPY);
+                Debug.LogFormat("The X: {0}, The Y: {1}", randx, randy);
+                GameObject x = Instantiate(player2, new Vector3(randx, .5f, randy), Quaternion.Euler(90, 0, 0));
+                x.name = "Second Box";
                 mapCreated = true;
                 Debug.Log("Finished Generating Map");
 

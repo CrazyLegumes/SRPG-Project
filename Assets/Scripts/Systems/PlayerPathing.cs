@@ -9,15 +9,20 @@ public class PlayerPathing : MonoBehaviour
 
 
     public Tile start;
-    bool pathing;
+    public bool pathing;
+    bool cancel;
     public Tile hitTile;
+    [SerializeField]
     Vector3 pos;
     bool canmove;
 
+    int moveR;
+    int AttR;
 
     List<Tile> closed;
     List<Tile> inRange;
-    List<Vector3> mypath;
+    [HideInInspector]
+    public List<Vector3> mypath;
     List<GameObject> inRangeObjs;
     List<GameObject> pathObjs;
 
@@ -26,128 +31,67 @@ public class PlayerPathing : MonoBehaviour
 
     [SerializeField]
     Transform player, cursortran;
-
-    [SerializeField]
-    Vector2 cursorpos;
-
-    [SerializeField]
-    int range;
-
-    bool MapCreated;
+    Vector3 cursorpos;
 
     public MapGen mapobj;
 
     // Use this for initialization
     void Start()
     {
-        MapCreated = false;
+        pos = transform.position;
         mypath = new List<Vector3>();
         inRangeObjs = new List<GameObject>();
         pathObjs = new List<GameObject>();
+        moveR = GetComponent<BaseUnit>().moveRange;
+        AttR = GetComponent<BaseUnit>().attackRange;
+        cancel = false;
 
+        InputController.fireEvent += CancelAction;
 
-        ThreadQueue.StartThreadFunction(WaitForMapGen);
+     
 
 
 
     }
 
-    void WaitForMapGen()
+    private void CancelAction(object sender, InputEvents<int> e)
     {
-        while (!MapGen.mapCreated) ;
-
-        Debug.Log("Done");
-
-        MapCreated = true;
-        Action find = () =>
+        if(pathing  && e.info == 1)
         {
-            mapobj = FindObjectOfType<MapGen>();
-            player = transform;
-            pos = player.position;
-            cursortran = Instantiate(cursor, new Vector3(pos.x, .3f, pos.z), Quaternion.Euler(90, 0, 0)).transform;
-            cursorpos = new Vector2(cursortran.position.x, cursortran.position.z);
-            Debug.Log("Player Assigned");
-        };
-        ThreadQueue.QueueAction(find);
-
-        Thread.Sleep(10);
-
-        ThreadQueue.StartThreadFunction(FindRange);
-
-
-
-
+            cancel = true;
+        }
     }
 
-    void CheckTile()
+    public  void CheckTile()
     {
-        hitTile = mapobj.map[(int)cursorpos.x, (int)cursorpos.y];
-
+        Thread.Sleep(10);
+        hitTile = GameMachine.instance.mapobj.map[(int)cursorpos.x, (int)cursorpos.z];
+        
         if (hitTile.walkable && inRange.Contains(hitTile))
         {
 
             ThreadQueue.StartThreadFunction(AStarFind);
+           
         }
     }
-
-    void CursorInput()
-    {
-        if (mapobj != null)
-        {
+    
 
 
 
 
-            if (Input.GetKeyDown(KeyCode.UpArrow))
-            {
-                cursorpos.y += 1;
-                if (!pathing)
-                    CheckTile();
-            }
-
-            if (Input.GetKeyDown(KeyCode.DownArrow))
-            {
-                cursorpos.y -= 1;
-
-                if (!pathing)
-                    CheckTile();
-
-            }
-
-            if (Input.GetKeyDown(KeyCode.RightArrow))
-            {
-                cursorpos.x += 1;
-                if (!pathing)
-                    CheckTile();
-            }
-
-            if (Input.GetKeyDown(KeyCode.LeftArrow))
-            {
-                cursorpos.x -= 1;
-                if (!pathing)
-                    CheckTile();
-            }
-
-
-            cursorpos.x = Mathf.Clamp(cursorpos.x, 0, mapobj.mapX - 1);
-            cursorpos.y = Mathf.Clamp(cursorpos.y, 0, mapobj.mapY - 1);
-            cursortran.position = new Vector3(cursorpos.x, .5f, cursorpos.y);
-            player.position = pos;
-
-
-
-        }
-    }
     // Update is called once per frame
     void Update()
     {
+        if (pathing)
+            transform.position = pos;
+        else
+            pos = transform.position;
 
-
-        CursorInput();
+        cursorpos = GameMachine.instance.cursor.transform.position;
 
         canmove = !pathing;
 
-
+        /*
         if (Input.GetKeyDown(KeyCode.Z) && closed != null && !pathing)
         {
             if (closed.Count > 0 && inRange.Contains(hitTile))
@@ -155,7 +99,8 @@ public class PlayerPathing : MonoBehaviour
                 ThreadQueue.StartThreadFunction(Path);
             }
         }
-        /*
+        
+        
                 if (Input.GetKeyDown(KeyCode.X) && MapCreated && !pathing)
                 {
 
@@ -181,13 +126,22 @@ public class PlayerPathing : MonoBehaviour
 
     }
 
-    void FindRange()
+    public void FindMoveRange()
     {
-        while (mapobj == null) ;
+        Thread.Sleep(10);
+
+        Action funx = () =>
+        {
+            Debug.Log(gameObject.name);
+
+        };
+
+        ThreadQueue.QueueAction(funx);
 
         inRange = new List<Tile>();
 
 
+        int range = moveR;
 
         int totalR = RecursiveRange(range);
 
@@ -195,7 +149,7 @@ public class PlayerPathing : MonoBehaviour
         bool done = false;
         int tileCount = 0;
 
-        Tile center = mapobj.map[(int)pos.x, (int)pos.z];
+        Tile center = GameMachine.instance.mapobj.map[(int)pos.x, (int)pos.z];
         open.Add(center);
         inRange.Add(center);//doo
         int repcount = 0;
@@ -222,10 +176,10 @@ public class PlayerPathing : MonoBehaviour
 
 
 
-            try { right = mapobj.map[curr.x + 1, curr.y]; } catch (Exception e) { right = null; }
-            try { left = mapobj.map[curr.x - 1, curr.y]; } catch (Exception e) { left = null; }
-            try { up = mapobj.map[curr.x, curr.y + 1]; } catch (Exception e) { up = null; }
-            try { down = mapobj.map[curr.x, curr.y - 1]; } catch (Exception e) { down = null; }
+            try { right = GameMachine.instance.mapobj.map[curr.x + 1, curr.y]; } catch (Exception e) { right = null; }
+            try { left = GameMachine.instance.mapobj.map[curr.x - 1, curr.y]; } catch (Exception e) { left = null; }
+            try { up = GameMachine.instance.mapobj.map[curr.x, curr.y + 1]; } catch (Exception e) { up = null; }
+            try { down = GameMachine.instance.mapobj.map[curr.x, curr.y - 1]; } catch (Exception e) { down = null; }
 
 
 
@@ -296,7 +250,7 @@ public class PlayerPathing : MonoBehaviour
         {
             Action func = () =>
             {
-                inRangeObjs.Add(Instantiate(myRange, new Vector3(curr.x, .03f, curr.y), Quaternion.identity));
+                inRangeObjs.Add(Instantiate(myRange, new Vector3(curr.x, .001f, curr.y), Quaternion.identity));
 
             };
 
@@ -305,11 +259,11 @@ public class PlayerPathing : MonoBehaviour
     }
 
 
-    void Path()
+    public void Path()
     {
         Thread.Sleep(100);
         Debug.Log("Walking..");
-        ThreadQueue.StartThreadFunction(DestroyPath);
+       // ThreadQueue.StartThreadFunction(DestroyPath);
         ThreadQueue.StartThreadFunction(DestroyRange);
         pathing = true;
 
@@ -328,32 +282,57 @@ public class PlayerPathing : MonoBehaviour
 
             while (Vector3.Distance(pos, dest) > .075f)
             {
-
+                
                 pos += desire;
                 Thread.Sleep(10);
+
+                if (cancel) {
+                    break;
+                }
 
 
 
             }
             pos = new Vector3(Mathf.RoundToInt(pos.x), pos.y, Mathf.RoundToInt(pos.z));
+            Debug.Log(GameMachine.instance.CurrentState);
+            if (cancel)
+                break;
+            
 
 
 
 
         }
 
+        if (cancel)
+        {
+            ThreadQueue.StartThreadFunction(DestroyPath);
+            Action func = () =>
+            {
+                pathing = false;
+                transform.position = GetComponent<BaseUnit>().cancelPos;
+                cancel = false;
+                GameMachine.instance.ChangeState<SelectMovement>();
+                
+
+            };
+
+            ThreadQueue.QueueAction(func);
+        }
+
         mypath.Clear();
         ThreadQueue.StartThreadFunction(ClearParents);
         pathing = false;
-        ThreadQueue.StartThreadFunction(FindRange);
+        
+        //ThreadQueue.StartThreadFunction(FindRange);
         // start = mapobj.map[(int)pos.x, (int)pos.z];
     }
 
     public void ClearParents()
     {
-        for (int i = 0; i < mapobj.mapX; i++)
-            for (int j = 0; j < mapobj.mapY; j++)
-                mapobj.map[i, j].parent = null;
+        for (int i = 0; i < GameMachine.instance.mapobj.mapX; i++)
+            for (int j = 0; j < GameMachine.instance.mapobj.mapY; j++)
+                GameMachine.instance.mapobj.map[i, j].parent = null;
     }
 
     public void AStarFind()
@@ -362,7 +341,7 @@ public class PlayerPathing : MonoBehaviour
 
         Tile endTile = hitTile;
 
-        start = mapobj.map[(int)pos.x, (int)pos.z];
+        start = GameMachine.instance.mapobj.map[(int)pos.x, (int)pos.z];
 
 
 
@@ -418,17 +397,17 @@ public class PlayerPathing : MonoBehaviour
 
 
             //Tile to Right;
-            if (mapobj.map[curr.x + 1, curr.y].walkable)
-                adjacents.Add(mapobj.map[curr.x + 1, curr.y]);
+            if (GameMachine.instance.mapobj.map[curr.x + 1, curr.y].walkable)
+                adjacents.Add(GameMachine.instance.mapobj.map[curr.x + 1, curr.y]);
             //Tile to Left;
-            if (mapobj.map[curr.x - 1, curr.y].walkable)
-                adjacents.Add(mapobj.map[curr.x - 1, curr.y]);
+            if (GameMachine.instance.mapobj.map[curr.x - 1, curr.y].walkable)
+                adjacents.Add(GameMachine.instance.mapobj.map[curr.x - 1, curr.y]);
             //Tile to North
-            if (mapobj.map[curr.x, curr.y + 1].walkable)
-                adjacents.Add(mapobj.map[curr.x, curr.y + 1]);
+            if (GameMachine.instance.mapobj.map[curr.x, curr.y + 1].walkable)
+                adjacents.Add(GameMachine.instance.mapobj.map[curr.x, curr.y + 1]);
             //Tile to South
-            if (mapobj.map[curr.x, curr.y - 1].walkable)
-                adjacents.Add(mapobj.map[curr.x, curr.y - 1]);
+            if (GameMachine.instance.mapobj.map[curr.x, curr.y - 1].walkable)
+                adjacents.Add(GameMachine.instance.mapobj.map[curr.x, curr.y - 1]);
 
             /*
 
@@ -530,7 +509,7 @@ public class PlayerPathing : MonoBehaviour
 
     }
 
-    void DestroyPath()
+    public void DestroyPath()
     {
         foreach (GameObject a in pathObjs.ToArray())
         {
@@ -542,7 +521,7 @@ public class PlayerPathing : MonoBehaviour
         }
     }
 
-    void DestroyRange()
+    public void DestroyRange()
     {
         foreach (GameObject a in inRangeObjs.ToArray())
         {
@@ -565,7 +544,7 @@ public class PlayerPathing : MonoBehaviour
             float ypos = a.z;
             Action func = () =>
             {
-                pathObjs.Add(Instantiate(path, new Vector3(xpos, .05f, ypos), Quaternion.identity));
+                pathObjs.Add(Instantiate(path, new Vector3(xpos, .002f, ypos), Quaternion.identity));
             };
 
             ThreadQueue.QueueAction(func);
