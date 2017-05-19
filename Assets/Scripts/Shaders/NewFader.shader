@@ -1,6 +1,9 @@
 ﻿Shader "Debug/UV 1" {
 	Properties{
 		Texture("Texture", 2D) = "white"{}
+		_Color("Color", Color) = (1,1,1,1)
+
+		[PerRendererData][MaterialToggle]CanFade("Can Fade", Float) = 0
 	}
 	SubShader{
 		Tags{
@@ -34,13 +37,17 @@
 		return o;
 	}
 	sampler2D Texture;
+	float4 _Color;
+	float CanFade;
 	float4 frag(v2f i) : SV_Target{
 
 		float4 color = tex2D(Texture, i.uv);
-		color.r = .2;
-		color.g = .8;
-		color.b = .8;
-		color.a = abs(sin(_Time[1] * 2));
+		
+		color.rgba *= _Color;
+		if (CanFade == 1)
+			color.a = abs(sin(_Time[1] * 2));
+		else
+			color.a = 1;
 		
 		return color;
 

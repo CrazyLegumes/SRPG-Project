@@ -1,0 +1,16 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: Tileset
+  m_EditorClassIdentifier: Assembly-CSharp::TileSet
+  tiles:
+  - {fileID: 1611225376451640, guid: 84850eea6c7a65742bc84cabdb0405b2, type: 2}
+  - {fileID: 1811054831198736, guid: 6be183f6a7c2dfc42a102bed2b764a94, type: 2}

@@ -414,7 +414,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &826428653
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -474,6 +474,54 @@ MonoBehaviour:
   cursorObj: {fileID: 1925642757120890, guid: 38681e6ef6f25964bb541d6dbe3eff3b, type: 2}
   cursor: {fileID: 0}
   mapobj: {fileID: 0}
+--- !u!1 &982161889
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 982161891}
+  - component: {fileID: 982161890}
+  m_Layer: 0
+  m_Name: MapEditor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &982161890
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 982161889}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e31b6e80c21cec54c8ad3dffd6eadfd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mapLength: 5
+  mapWidth: 10
+  tilesInEditor: -28
+  myTexture: {fileID: 2800000, guid: 78aa642e938c4084685b51b283637745, type: 3}
+  tileSet: {fileID: 11400000, guid: feadc71e089336e4297268eebc411ce3, type: 2}
+  currentTile: {fileID: 1611225376451640, guid: 84850eea6c7a65742bc84cabdb0405b2,
+    type: 2}
+  tileToRepalce: {fileID: 0}
+--- !u!4 &982161891
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 982161889}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -3}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1387966010
 GameObject:
   m_ObjectHideFlags: 0
@@ -666,8 +714,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1656905878}
-  m_LocalRotation: {x: 0.5, y: 0, z: 0, w: 0.8660254}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalRotation: {x: 0.70710665, y: -0, z: -0, w: 0.70710695}
+  m_LocalPosition: {x: 5.252756, y: 8.782959, z: 2.1831026}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
