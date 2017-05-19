@@ -48,7 +48,7 @@ public class PlayerPathing : MonoBehaviour
 
         InputController.fireEvent += CancelAction;
 
-     
+
 
 
 
@@ -56,25 +56,25 @@ public class PlayerPathing : MonoBehaviour
 
     private void CancelAction(object sender, InputEvents<int> e)
     {
-        if(pathing  && e.info == 1)
+        if (pathing && e.info == 1)
         {
             cancel = true;
         }
     }
 
-    public  void CheckTile()
+    public void CheckTile()
     {
         Thread.Sleep(10);
         hitTile = GameMachine.instance.mapobj.map[(int)cursorpos.x, (int)cursorpos.z];
-        
+
         if (hitTile.walkable && inRange.Contains(hitTile))
         {
 
             ThreadQueue.StartThreadFunction(AStarFind);
-           
+
         }
     }
-    
+
 
 
 
@@ -86,8 +86,8 @@ public class PlayerPathing : MonoBehaviour
             transform.position = pos;
         else
             pos = transform.position;
-
-        cursorpos = GameMachine.instance.cursor.transform.position;
+        if (GameMachine.instance.cursor != null)
+            cursorpos = GameMachine.instance.cursor.transform.position;
 
         canmove = !pathing;
 
@@ -244,7 +244,8 @@ public class PlayerPathing : MonoBehaviour
 
         }
 
-
+       
+        
 
         foreach (Tile curr in inRange)
         {
@@ -263,7 +264,7 @@ public class PlayerPathing : MonoBehaviour
     {
         Thread.Sleep(100);
         Debug.Log("Walking..");
-       // ThreadQueue.StartThreadFunction(DestroyPath);
+        // ThreadQueue.StartThreadFunction(DestroyPath);
         ThreadQueue.StartThreadFunction(DestroyRange);
         pathing = true;
 
@@ -282,11 +283,12 @@ public class PlayerPathing : MonoBehaviour
 
             while (Vector3.Distance(pos, dest) > .075f)
             {
-                
+
                 pos += desire;
                 Thread.Sleep(10);
 
-                if (cancel) {
+                if (cancel)
+                {
                     break;
                 }
 
@@ -297,7 +299,7 @@ public class PlayerPathing : MonoBehaviour
             Debug.Log(GameMachine.instance.CurrentState);
             if (cancel)
                 break;
-            
+
 
 
 
@@ -313,7 +315,7 @@ public class PlayerPathing : MonoBehaviour
                 transform.position = GetComponent<BaseUnit>().cancelPos;
                 cancel = false;
                 GameMachine.instance.ChangeState<SelectMovement>();
-                
+
 
             };
 
@@ -323,15 +325,15 @@ public class PlayerPathing : MonoBehaviour
         mypath.Clear();
         ThreadQueue.StartThreadFunction(ClearParents);
         pathing = false;
-        
+
         //ThreadQueue.StartThreadFunction(FindRange);
         // start = mapobj.map[(int)pos.x, (int)pos.z];
     }
 
     public void ClearParents()
     {
-        for (int i = 0; i < GameMachine.instance.mapobj.mapX; i++)
-            for (int j = 0; j < GameMachine.instance.mapobj.mapY; j++)
+        for (int i = 0; i < GameMachine.instance.mapobj.mapWidth; i++)
+            for (int j = 0; j < GameMachine.instance.mapobj.mapLength; j++)
                 GameMachine.instance.mapobj.map[i, j].parent = null;
     }
 

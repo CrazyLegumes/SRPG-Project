@@ -5,7 +5,7 @@ using System.IO;
 
 
 public class TileSet : ScriptableObject
-{ 
+{
     public GameObject[] tiles = new GameObject[0];
 }
 
@@ -21,44 +21,32 @@ public class MapEditor : MonoBehaviour
     public TileSet tileSet;
     public GameObject currentTile;
     public GameObject tileToRepalce;
-    bool spawned;
-   
+    public GameObject tempTile;
+    public bool spawned;
+    public Tile[,] map;
+    
+
     // Use this for initialization
     void Start()
     {
-        
+
     }
 
-    void OnEnable()
-    {
-        GameObject tempTile = Resources.Load<GameObject>("Prefabs/Tiles/TempTile");
-        if (!spawned)
-        {
-            for (int i = 0; i < mapLength; i++)
-            {
-                for (int j = 0; j < mapWidth; j++)
-                {
-                    Instantiate(tempTile, new Vector3(j, 0, i), Quaternion.Euler(90, 0, 0), transform);
-                }
-            }
-        }
-        spawned = true;
-        
-    }
+
 
     // Update is called once per frame
     void Update()
     {
-     
-        
+
+
     }
 
-    
+
 
 
     void OnDrawGizmos()
     {
-        Gizmos.color = Color.green;
+        Gizmos.color = Color.cyan;
         float xpos;
         for (int i = 0; i < mapLength + 1; i++)
         {
@@ -76,6 +64,23 @@ public class MapEditor : MonoBehaviour
             Gizmos.DrawLine(new Vector3(ypos, 0, -.5f), new Vector3(ypos, 0, mapLength - .5f));
         }
 
+    }
+
+    public void InstantiateTempTile()
+    {
+
+
+        for (int i = 0; i < mapLength; i++)
+        {
+            for (int j = 0; j < mapWidth; j++)
+            {
+                GameObject spawned = UnityEditor.PrefabUtility.InstantiatePrefab(tempTile) as GameObject;
+                spawned.transform.position = new Vector3(j, 0, i);
+                spawned.transform.parent = transform;
+            }
+        }
+
+        spawned = true;
     }
 
 }

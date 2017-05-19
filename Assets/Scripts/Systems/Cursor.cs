@@ -33,8 +33,8 @@ public class Cursor : MonoBehaviour
 
                     cursorpos += e.info;
 
-                    cursorpos.x = Mathf.Clamp(cursorpos.x, 0, GameMachine.instance.mapobj.mapX - 1);
-                    cursorpos.z = Mathf.Clamp(cursorpos.z, 0, GameMachine.instance.mapobj.mapY - 1);
+                    cursorpos.x = Mathf.Clamp(cursorpos.x, 0, GameMachine.instance.mapobj.mapWidth - 1);
+                    cursorpos.z = Mathf.Clamp(cursorpos.z, 0, GameMachine.instance.mapobj.mapLength - 1);
                     cursor.position = new Vector3(cursorpos.x, .01f, cursorpos.z);
                 }
             }
@@ -88,8 +88,8 @@ public class Cursor : MonoBehaviour
                 if (Input.GetKeyDown(KeyCode.LeftArrow))
                     cursorpos.x -= 1;
 
-                cursorpos.x = Mathf.Clamp(cursorpos.x, 0, GameMachine.instance.mapobj.mapX - 1);
-                cursorpos.z = Mathf.Clamp(cursorpos.z, 0, GameMachine.instance.mapobj.mapY - 1);
+                cursorpos.x = Mathf.Clamp(cursorpos.x, 0, GameMachine.instance.mapobj.mapWidth - 1);
+                cursorpos.z = Mathf.Clamp(cursorpos.z, 0, GameMachine.instance.mapobj.mapLength - 1);
                 cursor.position = new Vector3(cursorpos.x, .01f, cursorpos.z);
 
 

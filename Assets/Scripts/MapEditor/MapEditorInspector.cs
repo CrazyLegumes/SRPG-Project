@@ -23,7 +23,7 @@ public class MapEditorInspector : Editor
 
 
     private MapEditor editor;
-
+    private List<Tile[]> map = new List<Tile[]>();
 
 
 
@@ -34,8 +34,16 @@ public class MapEditorInspector : Editor
     void OnEnable()
     {
         editor = (MapEditor)target;
-
-
+        editor.tempTile = Resources.Load<GameObject>("Prefabs/Tiles/TempTile");
+        if (map.Count == 0)
+        {
+            editor.map = new Tile[editor.mapWidth, editor.mapLength];
+        }
+        else
+        {
+            
+        }
+            
 
 
         // GetTiles();
@@ -99,6 +107,12 @@ public class MapEditorInspector : Editor
 
         }
 
+        if (GUILayout.Button("Place Temp Map"))
+        {
+            editor.InstantiateTempTile();
+            Debug.Log("Instantiate Button Clicked");
+        }
+
 
 
 
@@ -115,32 +129,56 @@ public class MapEditorInspector : Editor
         int controllid = GUIUtility.GetControlID(FocusType.Passive);
 
         var ray = HandleUtility.GUIPointToWorldRay(e.mousePosition);
+
+       // Debug.Log(HandleUtility.WorldToGUIPoint(e.mousePosition));
+        
         RaycastHit hit;
+        
         if (Physics.Raycast(ray, out hit, 100))
         {
             
-            Debug.Log("Raycast hit : " + hit.collider.gameObject.name);
-            Debug.Log(hit.point);
+          //  Debug.Log("Raycast hit : " + hit.collider.gameObject.name);
+          if(hit.transform.GetComponent<TempTile>() != null)
+            {
+                
+                editor.tileToRepalce = hit.transform.gameObject;
+            }
+         //   Debug.Log(hit.point);
 
 
         }
-
+        // Debug.Log(ray.origin);
         // Ray point = Camera.current.ScreenPointToRay();
         // Vector3 mousepos = Camera.current.ScreenToViewportPoint(new Vector3(e.mousePosition.x , 1 -e.mousePosition.y + Camera.current.pixelHeight / editor.mapLength)*10);
         //mousepos.x = Mathf.Clamp(mousepos.x, 0, editor.mapWidth);
         // mousepos.y = Mathf.Clamp(mousepos.y, 0, editor.mapLength);
         // Debug.Log(mousepos);
-        if (e.isMouse && e.type == EventType.MouseDown)
+        if (e.isMouse && e.type == EventType.MouseDown && hit.transform != null && e.button == 0)
         {
             GUIUtility.hotControl = controllid;
             e.Use();
+            Vector3 allign = hit.transform.position;
             GameObject prefab = PrefabUtility.InstantiatePrefab(editor.currentTile) as GameObject;
-           // Debug.Log(mousepos);
-          //  Vector3 allign = new Vector3(Mathf.Floor(mousepos.x / editor.mapWidth) * editor.mapWidth + editor.mapWidth / 2.0f, 0,
-           //     Mathf.Floor(mousepos.y / editor.mapLength) * editor.mapLength + editor.mapLength / 2.0f);
-          //  Debug.Log(allign);
-           // prefab.transform.position = allign;
+
+            prefab.transform.position = allign;
             prefab.transform.parent = editor.transform;
+            editor.map[(int)allign.x, (int)allign.z] = prefab.GetComponent<Tile>();
+
+            DestroyImmediate(hit.transform.gameObject);
+
+        }
+        else if (e.isMouse && e.type == EventType.mouseDown && hit.transform != null && e.button == 1)
+        {
+            GUIUtility.hotControl = controllid;
+            e.Use();
+            Vector3 allign = hit.transform.position;
+            GameObject prefab = PrefabUtility.InstantiatePrefab(editor.tempTile) as GameObject;
+
+            prefab.transform.position = allign;
+            prefab.transform.parent = editor.transform;
+            editor.map[(int)allign.x, (int)allign.z] = null;
+
+            DestroyImmediate(hit.transform.gameObject);
 
         }
 
