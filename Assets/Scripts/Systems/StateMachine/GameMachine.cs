@@ -59,6 +59,7 @@ public class GameMachine : StateMachine
         
         
         
+        
 
         
     }
@@ -82,22 +83,22 @@ public class GameMachine : StateMachine
 
     void WaitForMapGen()
     {
-        //while (!MapGen.mapCreated) ;
 
-        Debug.Log("Done");
+
+
+
+
+
         
 
-        
         Action find = () =>
         {
             mapobj = FindObjectOfType<MapEditor>();
+           
 
-            foreach (Tile x in mapobj.map)
-            {
-                Debug.LogFormat("Xpos: {0}, Ypos: {1}", x.x, x.y);
-            }
+            
             cam = FindObjectOfType<CameraFollow>();
-            Debug.LogFormat("MapX {0}, MapY {1}", mapobj.mapLength, mapobj.mapWidth); 
+            
 
             Instantiate(cursorObj, new Vector3(1, .01f, 1), Quaternion.Euler(90,0,0));
             cursor = FindObjectOfType<Cursor>();
@@ -109,7 +110,6 @@ public class GameMachine : StateMachine
         ThreadQueue.QueueAction(find);
 
 
-        Thread.Sleep(10);
         
 
         //ThreadQueue.StartThreadFunction(FindRange);

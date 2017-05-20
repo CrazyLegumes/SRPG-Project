@@ -32,8 +32,9 @@ public class PlayerPathing : MonoBehaviour
     [SerializeField]
     Transform player, cursortran;
     Vector3 cursorpos;
+    Vector3 trackedPos;
 
-    public MapGen mapobj;
+    public Tile[] map;
 
     // Use this for initialization
     void Start()
@@ -45,6 +46,7 @@ public class PlayerPathing : MonoBehaviour
         moveR = GetComponent<BaseUnit>().moveRange;
         AttR = GetComponent<BaseUnit>().attackRange;
         cancel = false;
+
 
         InputController.fireEvent += CancelAction;
 
@@ -64,11 +66,15 @@ public class PlayerPathing : MonoBehaviour
 
     public void CheckTile()
     {
-        Thread.Sleep(10);
-        hitTile = GameMachine.instance.mapobj.map[(int)cursorpos.x, (int)cursorpos.z];
+        Thread.Sleep(20);
+
+        ClearParents();
+        hitTile = GameMachine.instance.mapobj.map[(int)cursorpos.z * GameMachine.instance.mapobj.mapWidth + (int)cursorpos.x];
+
 
         if (hitTile.walkable && inRange.Contains(hitTile))
         {
+
 
             ThreadQueue.StartThreadFunction(AStarFind);
 
@@ -82,6 +88,8 @@ public class PlayerPathing : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
+        trackedPos = transform.position;
         if (pathing)
             transform.position = pos;
         else
@@ -128,15 +136,9 @@ public class PlayerPathing : MonoBehaviour
 
     public void FindMoveRange()
     {
-        Thread.Sleep(10);
+        Thread.Sleep(20);
 
-        Action funx = () =>
-        {
-            Debug.Log(gameObject.name);
 
-        };
-
-        ThreadQueue.QueueAction(funx);
 
         inRange = new List<Tile>();
 
@@ -149,16 +151,17 @@ public class PlayerPathing : MonoBehaviour
         bool done = false;
         int tileCount = 0;
 
-        Tile center = GameMachine.instance.mapobj.map[(int)pos.x, (int)pos.z];
+        Tile center = GameMachine.instance.mapobj.map[(int)trackedPos.z * GameMachine.instance.mapobj.mapWidth + (int)trackedPos.x];
         open.Add(center);
         inRange.Add(center);//doo
         int repcount = 0;
         while (open.Count > 0)
         {
             repcount++;
-
+            /*
             if (repcount >= totalR)
                 break;
+                */
             Tile curr = open[0];
             open.RemoveAt(0);
 
@@ -176,64 +179,104 @@ public class PlayerPathing : MonoBehaviour
 
 
 
-            try { right = GameMachine.instance.mapobj.map[curr.x + 1, curr.y]; } catch (Exception e) { right = null; }
-            try { left = GameMachine.instance.mapobj.map[curr.x - 1, curr.y]; } catch (Exception e) { left = null; }
-            try { up = GameMachine.instance.mapobj.map[curr.x, curr.y + 1]; } catch (Exception e) { up = null; }
-            try { down = GameMachine.instance.mapobj.map[curr.x, curr.y - 1]; } catch (Exception e) { down = null; }
+            try { right = GameMachine.instance.mapobj.map[(curr.y) * GameMachine.instance.mapobj.mapWidth + (curr.x + 1)]; }
+            catch (Exception e)
+            {
+                right = null;
+
+            }
+            try { left = GameMachine.instance.mapobj.map[(curr.y) * GameMachine.instance.mapobj.mapWidth + (curr.x - 1)]; }
+            catch (Exception e)
+            {
+                left = null;
+
+            }
+            try { up = GameMachine.instance.mapobj.map[(curr.y + 1) * GameMachine.instance.mapobj.mapWidth + (curr.x)]; }
+            catch (Exception e)
+            {
+                up = null;
+
+            }
+            try { down = GameMachine.instance.mapobj.map[(curr.y - 1) * GameMachine.instance.mapobj.mapWidth + (curr.x - 1)]; }
+            catch (Exception e)
+            {
+                down = null;
+
+            }
+
+
 
 
 
             if (!open.Contains(right) && right != null && Tile.Distance(center, right) * right.cost <= range)
             {
 
+                open.Insert(0, right);
+
                 open.Add(right);
                 if (!inRange.Contains(right))
                 {
                     tileCount += right.cost;
-                    if (right.walkable)
+                    if (right.walkable && Range_AStar(center, right, range))
                         inRange.Add(right);
                 }
+                ClearParents();
+
+
             }
 
             if (!open.Contains(left) && left != null && Tile.Distance(center, left) * left.cost <= range)
             {
 
-                open.Add(left);
+                open.Insert(0, left);
+
                 if (!inRange.Contains(left))
                 {
                     tileCount += left.cost;
-                    if (left.walkable)
+                    if (left.walkable && Range_AStar(center, left, range))
                         inRange.Add(left);
                 }
+                ClearParents();
+
             }
 
             if (!open.Contains(up) && up != null && Tile.Distance(center, up) * up.cost <= range)
             {
 
-                open.Add(up);
+                open.Insert(0, up);
                 if (!inRange.Contains(up))
                 {
                     tileCount += up.cost;
-                    if (up.walkable)
+                    if (up.walkable && Range_AStar(center, up, range))
                         inRange.Add(up);
                 }
+                ClearParents();
+
             }
 
             if (!open.Contains(down) && down != null && Tile.Distance(center, down) * down.cost <= range)
             {
+
+
                 //
-                open.Add(down);
+
+                open.Insert(0, down);
                 if (!inRange.Contains(down))
                 {
                     tileCount += down.cost;
-                    if (down.walkable)
+                    if (down.walkable && Range_AStar(center, down, range))
                         inRange.Add(down);
                 }
+                ClearParents();
+
             }
 
 
             if (tileCount >= totalR || open.Count == 0)
+            {
+
                 done = true;
+            }
             if (done)
                 break;
 
@@ -243,15 +286,19 @@ public class PlayerPathing : MonoBehaviour
 
 
         }
+        ClearParents();
 
-       
-        
+
+
 
         foreach (Tile curr in inRange)
         {
+            
             Action func = () =>
             {
+
                 inRangeObjs.Add(Instantiate(myRange, new Vector3(curr.x, .001f, curr.y), Quaternion.identity));
+
 
             };
 
@@ -263,7 +310,7 @@ public class PlayerPathing : MonoBehaviour
     public void Path()
     {
         Thread.Sleep(100);
-        Debug.Log("Walking..");
+
         // ThreadQueue.StartThreadFunction(DestroyPath);
         ThreadQueue.StartThreadFunction(DestroyRange);
         pathing = true;
@@ -323,7 +370,7 @@ public class PlayerPathing : MonoBehaviour
         }
 
         mypath.Clear();
-        ThreadQueue.StartThreadFunction(ClearParents);
+        ClearParents();
         pathing = false;
 
         //ThreadQueue.StartThreadFunction(FindRange);
@@ -334,16 +381,170 @@ public class PlayerPathing : MonoBehaviour
     {
         for (int i = 0; i < GameMachine.instance.mapobj.mapWidth; i++)
             for (int j = 0; j < GameMachine.instance.mapobj.mapLength; j++)
-                GameMachine.instance.mapobj.map[i, j].parent = null;
+            {
+                Tile reset = GameMachine.instance.mapobj.map[j * GameMachine.instance.mapobj.mapWidth + i];
+                reset.parent = null;
+                reset.g = reset.f = reset.h = 0;
+
+            }
+    }
+
+
+    bool Range_AStar(Tile begin, Tile endTile, int range)
+    {
+
+
+        ClearParents();
+
+        bool stop = false;
+
+
+
+        List<Tile> pathing = new List<Tile>();
+        List<Tile> check = new List<Tile>();
+        begin.f = 100;
+        begin.h = Tile.Distance(begin, endTile);
+
+
+        Tile current = begin;
+        check.Add(begin);
+
+        while (check.Count > 0)
+        {
+            foreach (Tile e in check)
+            {
+                if (e.h < current.h)
+                    current = e;
+                if (current == endTile)
+                {
+                    stop = true;
+                    break;
+                }
+            }
+
+            if (!check.Remove(current))
+            {
+                Debug.LogFormat("Failed to Remove Tile at {0} , {1}, End Tile Was: {2} , {3} ", current.x, current.y, endTile.x, endTile.y);
+                Debug.LogFormat("Failed Tile Stuff: X Y F G H: {0},{1},{2},{3},{4}", current.x, current.y, current.f, current.g, current.h);
+                foreach(Tile e in check)
+                {
+                    Debug.LogFormat("Things In Open Tile Stuff: X Y F G H: {0},{1},{2},{3},{4}", e.x, e.y, e.f, e.g, e.h);
+                }
+                return false;
+
+            }
+            pathing.Add(current);
+
+            if (pathing.Count - 1 > range)
+                return false;
+
+            if (stop)
+                break;
+
+            List<Tile> adj = new List<Tile>();
+
+            Tile right = null;
+            Tile left = null;
+            Tile up = null;
+            Tile down = null;
+
+
+
+
+            try { right = GameMachine.instance.mapobj.map[(current.y) * GameMachine.instance.mapobj.mapWidth + (current.x + 1)]; }
+            catch (Exception e)
+            {
+                right = null;
+
+            }
+            try { left = GameMachine.instance.mapobj.map[(current.y) * GameMachine.instance.mapobj.mapWidth + (current.x - 1)]; }
+            catch (Exception e)
+            {
+                left = null;
+
+            }
+            try { up = GameMachine.instance.mapobj.map[(current.y + 1) * GameMachine.instance.mapobj.mapWidth + (current.x)]; }
+            catch (Exception e)
+            {
+                up = null;
+
+            }
+            try { down = GameMachine.instance.mapobj.map[(current.y - 1) * GameMachine.instance.mapobj.mapWidth + (current.x)]; }
+            catch (Exception e)
+            {
+                down = null;
+
+            }
+
+            if (right != null && right.walkable)
+                adj.Add(right);
+            if (left != null && left.walkable)
+                adj.Add(left);
+            if (up != null && up.walkable)
+                adj.Add(up);
+            if (down != null && down.walkable)
+                adj.Add(down);
+
+
+            foreach (Tile e in adj)
+            {
+                if (pathing.Contains(e))
+                    continue;
+
+                else if (check.Contains(e))
+                {
+                    Tile m = null;
+
+                    foreach (Tile x in check)
+                    {
+                        if (e == x)
+                        {
+                            m = x;
+                            break;
+                        }
+                    }
+
+
+                    if (e.g < m.g)
+                    {
+
+                        m.parent = current;
+                        m.g = e.g;
+                        m.f = m.g + m.h;
+                        continue;
+                    }
+                    else
+                        continue;
+                }
+                else
+                {
+                  //  Debug.LogFormat("Adding Tile: {0} , {1} in search of Tile: {2} , {3} ", e.x, e.y, endTile.x, endTile.y);
+                    e.parent = current;
+                    e.g = Tile.Distance(e, begin);
+                    e.h = Tile.Distance(e, endTile);
+                    e.f = e.h + e.g;
+                    check.Add(e);
+
+                }
+            }
+
+        }
+
+        ClearParents();
+
+        if (pathing.Count - 1 > range)
+            return false;
+        else
+            return true;
     }
 
     public void AStarFind()
     {
-
+        Thread.Sleep(10);
 
         Tile endTile = hitTile;
 
-        start = GameMachine.instance.mapobj.map[(int)pos.x, (int)pos.z];
+        start = GameMachine.instance.mapobj.map[(int)trackedPos.z * GameMachine.instance.mapobj.mapWidth + (int)trackedPos.x];
 
 
 
@@ -384,11 +585,12 @@ public class PlayerPathing : MonoBehaviour
 
             if (!open.Remove(curr))
             {
-                Debug.Log("Failed TO Remove");
+
                 Debug.Log("Tile that Failed: " + curr.position);
 
                 break;
             }
+
 
             closed.Add(curr);
             if (done)
@@ -398,18 +600,52 @@ public class PlayerPathing : MonoBehaviour
             List<Tile> adjacents = new List<Tile>();
 
 
+            Tile right = null;
+            Tile left = null;
+            Tile up = null;
+            Tile down = null;
+
+
+
+
+            try { right = GameMachine.instance.mapobj.map[(curr.y) * GameMachine.instance.mapobj.mapWidth + (curr.x + 1)]; }
+            catch (Exception e)
+            {
+                right = null;
+
+            }
+            try { left = GameMachine.instance.mapobj.map[(curr.y) * GameMachine.instance.mapobj.mapWidth + (curr.x - 1)]; }
+            catch (Exception e)
+            {
+                left = null;
+
+            }
+            try { up = GameMachine.instance.mapobj.map[(curr.y + 1) * GameMachine.instance.mapobj.mapWidth + (curr.x)]; }
+            catch (Exception e)
+            {
+                up = null;
+
+            }
+            try { down = GameMachine.instance.mapobj.map[(curr.y - 1) * GameMachine.instance.mapobj.mapWidth + (curr.x)]; }
+            catch (Exception e)
+            {
+                down = null;
+
+            }
+
+
             //Tile to Right;
-            if (GameMachine.instance.mapobj.map[curr.x + 1, curr.y].walkable)
-                adjacents.Add(GameMachine.instance.mapobj.map[curr.x + 1, curr.y]);
+            if (right != null && right.walkable)
+                adjacents.Add(right);
             //Tile to Left;
-            if (GameMachine.instance.mapobj.map[curr.x - 1, curr.y].walkable)
-                adjacents.Add(GameMachine.instance.mapobj.map[curr.x - 1, curr.y]);
+            if (left != null && left.walkable)
+                adjacents.Add(left);
             //Tile to North
-            if (GameMachine.instance.mapobj.map[curr.x, curr.y + 1].walkable)
-                adjacents.Add(GameMachine.instance.mapobj.map[curr.x, curr.y + 1]);
+            if (up != null && up.walkable)
+                adjacents.Add(up);
             //Tile to South
-            if (GameMachine.instance.mapobj.map[curr.x, curr.y - 1].walkable)
-                adjacents.Add(GameMachine.instance.mapobj.map[curr.x, curr.y - 1]);
+            if (down != null && down.walkable)
+                adjacents.Add(down);
 
             /*
 

@@ -11,6 +11,7 @@ public class SelectMovement : BattleState
     {
         base.Enter();
         unit = GameMachine.instance.selectedUnit;
+        Debug.Log(unit.name);
         ThreadQueue.StartThreadFunction(unit.unitPathing.FindMoveRange);
         //ThreadQueue.StartThreadFunction(unit.unitPathing.CheckTile);
     }

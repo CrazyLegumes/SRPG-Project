@@ -8,6 +8,11 @@ public class SelectUnit : BattleState
     public override void Enter()
     {
         base.Enter();
+        if (GameMachine.instance.cursor.highlighted != null)
+        {
+            GameMachine.instance.cursor.highlighted.selected = false;
+            GameMachine.instance.cursor.highlighted = null;
+        }
         GameMachine.instance.selectedUnit = null;
         Debug.Log(GameMachine.instance.CurrentState);
         GameMachine.instance.cursor.canMove = true;

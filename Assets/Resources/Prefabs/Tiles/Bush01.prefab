@@ -22,7 +22,7 @@ GameObject:
   - component: {fileID: 33863318301745876}
   - component: {fileID: 64916939472029736}
   - component: {fileID: 23736999846890316}
-  - component: {fileID: 114036073549323482}
+  - component: {fileID: 114476540925807620}
   m_Layer: 0
   m_Name: Bush01
   m_TagString: Untagged
@@ -95,7 +95,7 @@ MeshCollider:
   m_InflateMesh: 0
   m_SkinWidth: 0.01
   m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &114036073549323482
+--- !u!114 &114476540925807620
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -113,6 +113,6 @@ MonoBehaviour:
   f: 0
   g: 0
   h: 0
-  cost: 99
+  cost: 1
   position: {x: 0, y: 0}
   parent: {fileID: 0}

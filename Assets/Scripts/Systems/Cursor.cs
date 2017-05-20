@@ -44,6 +44,7 @@ public class Cursor : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        
 
     }
 
@@ -61,11 +62,24 @@ public class Cursor : MonoBehaviour
 
     void OnTriggerExit(Collider col)
     {
-        if (GameMachine.instance.selectedUnit != highlighted )
+        Debug.Log(GameMachine.instance.CurrentState);
+        if (GameMachine.instance.CurrentState.ToString() != "SelectMovement")
         {
             highlighted.selected = false;
             highlighted = null;
         }
+    }
+
+    void OnTriggerStay(Collider col)
+    {
+        if (col.GetComponent<BaseUnit>() != null)
+        {
+            highlighted = col.GetComponent<BaseUnit>();
+            if (highlighted.active)
+                highlighted.selected = true;
+
+        }
+
     }
 
     void CursorInput()

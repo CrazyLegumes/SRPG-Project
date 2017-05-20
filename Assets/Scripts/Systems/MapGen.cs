@@ -43,7 +43,7 @@ public class MapGen : MonoBehaviour
 
         map = new Tile[mapX, mapY];
         
-        ThreadQueue.StartThreadFunction(GenerateMap);
+       // ThreadQueue.StartThreadFunction(GenerateMap);
 
     }
 
@@ -58,6 +58,7 @@ public class MapGen : MonoBehaviour
         return start;
     }
 
+    /*
     void GenerateMap()
     {
 
@@ -140,4 +141,5 @@ public class MapGen : MonoBehaviour
 
 
     }
+    */
 }

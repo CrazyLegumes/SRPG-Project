@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 
-
+[System.Serializable]
 public class TileSet : ScriptableObject
 {
     public GameObject[] tiles = new GameObject[0];
 }
 
-[ExecuteInEditMode]
+[System.Serializable]
 public class MapEditor : MonoBehaviour
 {
 
@@ -23,8 +23,17 @@ public class MapEditor : MonoBehaviour
     public GameObject tileToRepalce;
     public GameObject tempTile;
     public bool spawned;
-    public Tile[,] map;
+    public Tile[] map;
+    public int index;
+    public DataMap mapdata;
+    public bool mapset;
+    public List<Tile> TileList;
     
+
+    void Awake()
+    {
+
+    }
 
     // Use this for initialization
     void Start()

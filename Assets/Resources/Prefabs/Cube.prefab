@@ -39,7 +39,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1590784159755684}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 2, y: 0, z: 4}
   m_LocalScale: {x: 0.8, y: 0.5, z: 0.8}
   m_Children: []
   m_Father: {fileID: 0}
@@ -121,7 +121,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 706db2d20c09c1f4b9eb01cae8ea5533, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveRange: 5
+  moveRange: 3
   attackRange: 1
   active: 0
   selected: 0
@@ -139,27 +139,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 136fa67287bd6354e8b2560954d86247, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  start:
-    walkable: 0
-    start: 0
-    x: 0
-    y: 0
-    f: 0
-    g: 0
-    h: 0
-    cost: 0
-    position: {x: 0, y: 0}
+  start: {fileID: 0}
   pathing: 0
-  hitTile:
-    walkable: 0
-    start: 0
-    x: 0
-    y: 0
-    f: 0
-    g: 0
-    h: 0
-    cost: 0
-    position: {x: 0, y: 0}
+  hitTile: {fileID: 0}
   pos: {x: 0, y: 0, z: 0}
   mypath: []
   path: {fileID: 1522176267408974, guid: 62d4009407ad47d47a98b15487b4ad4d, type: 2}

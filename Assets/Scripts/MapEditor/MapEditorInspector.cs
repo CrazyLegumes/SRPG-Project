@@ -21,11 +21,17 @@ public class MapEditorInspector : Editor
         EditorUtility.FocusProjectWindow();
     }
 
-
+    
     private MapEditor editor;
-    private List<Tile[]> map = new List<Tile[]>();
-
-
+    SerializedProperty mapData;
+    SerializedObject mapObj;
+    SerializedProperty SetData;
+    SerializedProperty listData;
+    DataMap data;
+    TileSet mySet;
+   
+    private List<Tile> map = new List<Tile>();
+  
 
     private List<string> prefabs;
     string tilepath;
@@ -34,18 +40,12 @@ public class MapEditorInspector : Editor
     void OnEnable()
     {
         editor = (MapEditor)target;
+        mapObj = new SerializedObject(target);
         editor.tempTile = Resources.Load<GameObject>("Prefabs/Tiles/TempTile");
-        if (map.Count == 0)
-        {
-            editor.map = new Tile[editor.mapWidth, editor.mapLength];
-        }
-        else
-        {
-            
-        }
-            
-
-
+        mapData = mapObj.FindProperty("mapdata");
+        SetData = mapObj.FindProperty("tileSet");
+        listData = mapObj.FindProperty("TileList");
+        
         // GetTiles();
 
 
@@ -73,24 +73,39 @@ public class MapEditorInspector : Editor
 
     }
 
+
+    public void ClearMap()
+    {
+        foreach(Tile a in map.ToArray())
+        {
+            DestroyImmediate(a.gameObject);
+        }
+    }
+
     public override void OnInspectorGUI()
     {
-
+        
 
         //Grid Lines and Stuff
+
+        mapObj.Update();
+        EditorUtility.SetDirty(editor);
         editor.mapLength = Mathf.Clamp(editor.mapLength, 5, 40);
         editor.mapWidth = Mathf.Clamp(editor.mapWidth, 5, 40);
         editor.mapLength = EditorGUILayout.IntField("Map Length", editor.mapLength);
         editor.mapWidth = EditorGUILayout.IntField("Map Width", editor.mapWidth);
 
-        TileSet set = (TileSet)EditorGUILayout.ObjectField("Tile Set", editor.tileSet, typeof(TileSet), false);
 
+        GUILayout.Label("Tile Set Data");
 
+       
+        mySet = (TileSet)EditorGUILayout.ObjectField(SetData.objectReferenceValue, typeof(TileSet), false);
         GameObject currentTile = (GameObject)EditorGUILayout.ObjectField("Current Tile", editor.currentTile, typeof(GameObject), false);
 
-
-        if (set != null)
+        if (mySet != null)
         {
+            EditorGUI.BeginChangeCheck();
+            editor.tileSet = mySet;
             string[] tiles = new string[editor.tileSet.tiles.Length];
             int[] values = new int[tiles.Length];
 
@@ -101,22 +116,85 @@ public class MapEditorInspector : Editor
             }
 
             int index = EditorGUILayout.IntPopup("Select Tile", oldindex, tiles, values);
-            if (oldindex != index)
-                oldindex = index;
+            if (EditorGUI.EndChangeCheck())
+            {
+                if (oldindex != index)
+                    oldindex = index;
+                Undo.RecordObject(editor.currentTile, "Changed Tile");
+
+            }
             editor.currentTile = editor.tileSet.tiles[oldindex];
+        }
+        
+
+     
+        GUILayout.Label("Map Data");
+        data = EditorGUILayout.ObjectField(mapData.objectReferenceValue, typeof(DataMap), true) as DataMap;
+
+
+
+
+
+       if(data == null && GUI.changed)
+        {
+            editor.mapset = false;
+        }
+
+        if (data != null && !editor.mapset)
+        {
+
+
+            editor.mapset = true;
+            editor.mapdata = data;
+            
+            editor.map = data.data;
 
         }
+
+        
 
         if (GUILayout.Button("Place Temp Map"))
         {
             editor.InstantiateTempTile();
-            Debug.Log("Instantiate Button Clicked");
+           
+        }
+
+        if(GUILayout.Button("Clear Map"))
+        {
+            ClearMap();
+        }
+
+        if (GUILayout.Button("Save Map"))
+        {
+
+
+
+            GameObject asset = new GameObject("MapData");
+
+            asset.AddComponent<DataMap>();
+            DataMap  assetData = asset.GetComponent<DataMap>();
+           
+            assetData.count = 0;
+            
+            assetData.data = new Tile[editor.mapWidth * editor.mapLength];
+
+            for (int i = 0; i < map.Count; i++)
+            {
+                Tile tile = map[i];
+                assetData.data[tile.y * editor.mapWidth +  tile.x] = tile;
+                
+                assetData.count++;
+            }
+
+
+            
+
         }
 
 
 
-
-
+        
+        
 
 
 
@@ -130,39 +208,51 @@ public class MapEditorInspector : Editor
 
         var ray = HandleUtility.GUIPointToWorldRay(e.mousePosition);
 
-       // Debug.Log(HandleUtility.WorldToGUIPoint(e.mousePosition));
-        
+      
         RaycastHit hit;
-        
+
         if (Physics.Raycast(ray, out hit, 100))
         {
-            
-          //  Debug.Log("Raycast hit : " + hit.collider.gameObject.name);
-          if(hit.transform.GetComponent<TempTile>() != null)
+
+           
+            if (hit.transform.GetComponent<TempTile>() != null)
             {
-                
+
                 editor.tileToRepalce = hit.transform.gameObject;
             }
-         //   Debug.Log(hit.point);
+        
 
 
         }
-        // Debug.Log(ray.origin);
-        // Ray point = Camera.current.ScreenPointToRay();
-        // Vector3 mousepos = Camera.current.ScreenToViewportPoint(new Vector3(e.mousePosition.x , 1 -e.mousePosition.y + Camera.current.pixelHeight / editor.mapLength)*10);
-        //mousepos.x = Mathf.Clamp(mousepos.x, 0, editor.mapWidth);
-        // mousepos.y = Mathf.Clamp(mousepos.y, 0, editor.mapLength);
-        // Debug.Log(mousepos);
+        
         if (e.isMouse && e.type == EventType.MouseDown && hit.transform != null && e.button == 0)
         {
+
+
             GUIUtility.hotControl = controllid;
             e.Use();
+
+
             Vector3 allign = hit.transform.position;
             GameObject prefab = PrefabUtility.InstantiatePrefab(editor.currentTile) as GameObject;
+            Tile tile = prefab.GetComponent<Tile>();
+
+            tile.x = (int)allign.x;
+            tile.y = (int)allign.z;
 
             prefab.transform.position = allign;
             prefab.transform.parent = editor.transform;
-            editor.map[(int)allign.x, (int)allign.z] = prefab.GetComponent<Tile>();
+            
+            if (hit.transform.GetComponent<Tile>() != null)
+            {
+                Tile replace = hit.transform.GetComponent<Tile>();
+                map.Remove(replace);
+                map.Add(tile);
+            }
+            else
+            {
+                map.Add(tile);
+            }
 
             DestroyImmediate(hit.transform.gameObject);
 
@@ -176,7 +266,14 @@ public class MapEditorInspector : Editor
 
             prefab.transform.position = allign;
             prefab.transform.parent = editor.transform;
-            editor.map[(int)allign.x, (int)allign.z] = null;
+
+
+
+            if (hit.transform.GetComponent<Tile>() != null)
+            {
+                Tile tile = hit.transform.GetComponent<Tile>();
+                map.Remove(tile);
+            }
 
             DestroyImmediate(hit.transform.gameObject);
 
@@ -191,6 +288,7 @@ public class MapEditorInspector : Editor
 
 
 }
+
 
 
 
