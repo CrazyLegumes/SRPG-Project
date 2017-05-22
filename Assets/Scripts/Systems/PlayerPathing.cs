@@ -35,6 +35,7 @@ public class PlayerPathing : MonoBehaviour
     Vector3 trackedPos;
 
     public Tile[] map;
+    public Tile[] rangeMap;
 
     // Use this for initialization
     void Start()
@@ -158,10 +159,10 @@ public class PlayerPathing : MonoBehaviour
         while (open.Count > 0)
         {
             repcount++;
-            /*
-            if (repcount >= totalR)
+
+            if (repcount >= GameMachine.instance.mapobj.mapdata.count)
                 break;
-                */
+
             Tile curr = open[0];
             open.RemoveAt(0);
 
@@ -220,7 +221,7 @@ public class PlayerPathing : MonoBehaviour
                     if (right.walkable && Range_AStar(center, right, range))
                         inRange.Add(right);
                 }
-                ClearParents();
+                //ClearParents();
 
 
             }
@@ -236,7 +237,7 @@ public class PlayerPathing : MonoBehaviour
                     if (left.walkable && Range_AStar(center, left, range))
                         inRange.Add(left);
                 }
-                ClearParents();
+                //ClearParents();
 
             }
 
@@ -250,7 +251,7 @@ public class PlayerPathing : MonoBehaviour
                     if (up.walkable && Range_AStar(center, up, range))
                         inRange.Add(up);
                 }
-                ClearParents();
+                //ClearParents();
 
             }
 
@@ -267,16 +268,12 @@ public class PlayerPathing : MonoBehaviour
                     if (down.walkable && Range_AStar(center, down, range))
                         inRange.Add(down);
                 }
-                ClearParents();
+               // ClearParents();
 
             }
 
 
-            if (tileCount >= totalR || open.Count == 0)
-            {
 
-                done = true;
-            }
             if (done)
                 break;
 
@@ -286,16 +283,17 @@ public class PlayerPathing : MonoBehaviour
 
 
         }
-        ClearParents();
+     //   ClearParents();
 
 
-
+        rangeMap = new Tile[GameMachine.instance.mapobj.mapdata.count];
 
         foreach (Tile curr in inRange)
         {
-            
+            rangeMap[curr.y * GameMachine.instance.mapobj.mapWidth + curr.x] = curr;
             Action func = () =>
             {
+
 
                 inRangeObjs.Add(Instantiate(myRange, new Vector3(curr.x, .001f, curr.y), Quaternion.identity));
 
@@ -390,13 +388,16 @@ public class PlayerPathing : MonoBehaviour
     }
 
 
-    bool Range_AStar(Tile begin, Tile endTile, int range)
+    bool Range_AStar(Tile begin, Tile endTile, int range, bool data = false)
     {
+        Debug.Log("Started");
 
-
-        ClearParents();
+       // ClearParents();
 
         bool stop = false;
+
+        if (endTile.x == 3 && endTile.y == 2)
+            data = true;
 
 
 
@@ -411,9 +412,14 @@ public class PlayerPathing : MonoBehaviour
 
         while (check.Count > 0)
         {
+
+            current = check[0];
             foreach (Tile e in check)
             {
-                if (e.h < current.h)
+
+
+                // Debug.LogFormat("E's F score {0} currents F Score {1}", e.f, current.f);
+                if (e.f < current.f || e.f == current.f && e.h < current.h)
                     current = e;
                 if (current == endTile)
                 {
@@ -421,22 +427,21 @@ public class PlayerPathing : MonoBehaviour
                     break;
                 }
             }
-
+            
+            /*
+            if (data)
+                Debug.LogFormat("Lowest Tile Current Stats X: {0} Y: {1} G: {2} H: {3} F: {4}", current.x, current.y, current.g, current.h, current.f);
+*/
             if (!check.Remove(current))
             {
                 Debug.LogFormat("Failed to Remove Tile at {0} , {1}, End Tile Was: {2} , {3} ", current.x, current.y, endTile.x, endTile.y);
-                Debug.LogFormat("Failed Tile Stuff: X Y F G H: {0},{1},{2},{3},{4}", current.x, current.y, current.f, current.g, current.h);
-                foreach(Tile e in check)
-                {
-                    Debug.LogFormat("Things In Open Tile Stuff: X Y F G H: {0},{1},{2},{3},{4}", e.x, e.y, e.f, e.g, e.h);
-                }
+
                 return false;
 
             }
             pathing.Add(current);
 
-            if (pathing.Count - 1 > range)
-                return false;
+
 
             if (stop)
                 break;
@@ -491,48 +496,41 @@ public class PlayerPathing : MonoBehaviour
                 if (pathing.Contains(e))
                     continue;
 
-                else if (check.Contains(e))
+                int newCost = current.g + Tile.Distance(current, e) + e.cost;
+                if (newCost < e.g || !check.Contains(e))
                 {
-                    Tile m = null;
-
-                    foreach (Tile x in check)
-                    {
-                        if (e == x)
-                        {
-                            m = x;
-                            break;
-                        }
-                    }
-
-
-                    if (e.g < m.g)
-                    {
-
-                        m.parent = current;
-                        m.g = e.g;
-                        m.f = m.g + m.h;
-                        continue;
-                    }
-                    else
-                        continue;
-                }
-                else
-                {
-                  //  Debug.LogFormat("Adding Tile: {0} , {1} in search of Tile: {2} , {3} ", e.x, e.y, endTile.x, endTile.y);
-                    e.parent = current;
-                    e.g = Tile.Distance(e, begin);
+                    e.g = newCost;
                     e.h = Tile.Distance(e, endTile);
-                    e.f = e.h + e.g;
-                    check.Add(e);
+                    e.f = e.g + e.h;
+                    e.parent = current;
+
+                    if (!check.Contains(e))
+                        check.Add(e);
 
                 }
             }
 
         }
 
-        ClearParents();
+        // ClearParents();
 
-        if (pathing.Count - 1 > range)
+        List<Tile> trueList = new List<Tile>();
+
+        pathing.Reverse();
+        Tile me = pathing[0];
+        int totalcost = 0;
+
+        while (me.parent != null)
+        {
+           
+            trueList.Add(me);
+            totalcost += me.cost;
+            me = me.parent;
+        }
+        
+
+
+        if (trueList.Count > range || totalcost > range)
             return false;
         else
             return true;
@@ -571,6 +569,7 @@ public class PlayerPathing : MonoBehaviour
 
         while (open.Count > 0)
         {
+            curr = open[0];
             foreach (Tile e in open)
             {
 
@@ -608,25 +607,25 @@ public class PlayerPathing : MonoBehaviour
 
 
 
-            try { right = GameMachine.instance.mapobj.map[(curr.y) * GameMachine.instance.mapobj.mapWidth + (curr.x + 1)]; }
+            try { right = rangeMap[(curr.y) * GameMachine.instance.mapobj.mapWidth + (curr.x + 1)]; }
             catch (Exception e)
             {
                 right = null;
 
             }
-            try { left = GameMachine.instance.mapobj.map[(curr.y) * GameMachine.instance.mapobj.mapWidth + (curr.x - 1)]; }
+            try { left = rangeMap[(curr.y) * GameMachine.instance.mapobj.mapWidth + (curr.x - 1)]; }
             catch (Exception e)
             {
                 left = null;
 
             }
-            try { up = GameMachine.instance.mapobj.map[(curr.y + 1) * GameMachine.instance.mapobj.mapWidth + (curr.x)]; }
+            try { up = rangeMap[(curr.y + 1) * GameMachine.instance.mapobj.mapWidth + (curr.x)]; }
             catch (Exception e)
             {
                 up = null;
 
             }
-            try { down = GameMachine.instance.mapobj.map[(curr.y - 1) * GameMachine.instance.mapobj.mapWidth + (curr.x)]; }
+            try { down = rangeMap[(curr.y - 1) * GameMachine.instance.mapobj.mapWidth + (curr.x)]; }
             catch (Exception e)
             {
                 down = null;
@@ -667,52 +666,22 @@ public class PlayerPathing : MonoBehaviour
 
 
 
-            foreach (Tile a in adjacents)
+            foreach (Tile e in adjacents)
             {
-                if (closed.Contains(a))
-                {
-
+                if (closed.Contains(e))
                     continue;
-                }
 
-
-                else if (open.Contains(a))
+                int newCost = curr.g + Tile.Distance(curr, e) + e.cost;
+                if (newCost < e.g || !open.Contains(e))
                 {
-                    Tile m = null;
-                    foreach (Tile x in open)
-                    {
-                        if (a == x)
-                        {
-                            m = x;
-                            break;
-                        }
-                    }
+                    e.g = newCost;
+                    e.h = Tile.Distance(e, endTile);
+                    e.f = e.g + e.h;
+                    e.parent = curr;
 
+                    if (!open.Contains(e))
+                        open.Add(e);
 
-                    if (a.g < m.g)
-                    {
-
-                        m.parent = curr;
-                        m.g = a.g;
-                        m.f = m.g + m.h;
-                        continue;
-                    }
-                    else {
-
-                        continue;
-
-                    }
-
-                }
-
-                else
-                {
-
-                    a.parent = curr;
-                    a.g = Mathf.Abs(a.x - start.x) + Mathf.Abs(a.y - start.y);
-                    a.h = Mathf.Abs(a.x - endTile.x) + Mathf.Abs(a.y - endTile.y);
-                    a.f = a.h + a.g;
-                    open.Add(a);
                 }
             }
 
@@ -749,6 +718,7 @@ public class PlayerPathing : MonoBehaviour
 
     public void DestroyPath()
     {
+        Thread.Sleep(5);
         foreach (GameObject a in pathObjs.ToArray())
         {
             Action destroy = () =>
@@ -773,9 +743,11 @@ public class PlayerPathing : MonoBehaviour
 
     void DrawPath()
     {
+
+
         ThreadQueue.StartThreadFunction(DestroyPath);
 
-
+        Thread.Sleep(5);
         foreach (Vector3 a in mypath)
         {
             float xpos = a.x;

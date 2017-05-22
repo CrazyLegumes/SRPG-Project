@@ -58,7 +58,7 @@ public class ThreadJob
     public virtual void Start()
     {
         job = new Thread(Run);
-       
+
         job.IsBackground = true;
         job.Start();
 
@@ -72,11 +72,11 @@ public class ThreadJob
 
     public virtual void OnFinish()
     {
-        
+
         Debug.Log("Finished Task");
         ThreadQueue.activeThreads.Remove(job);
         ThreadQueue.activeJobs.Remove(this);
-        
+
     }
 
     public virtual bool Update()
@@ -130,12 +130,13 @@ public class ThreadQueue : MonoBehaviour
     void Update()
     {
 
-         for(int i = 0; i < activeJobs.Count; i++)
+        for (int i = 0; i < activeJobs.Count; i++)
         {
-            activeJobs[i].Update();
+            if (activeJobs[i] != null)
+                activeJobs[i].Update();
         }
-            
-            
+
+
         threadcount = activeThreads.Count;
         while (QueuedActions.Count > 0)
         {
@@ -149,7 +150,7 @@ public class ThreadQueue : MonoBehaviour
 
 
 
-       
+
 
 
     }

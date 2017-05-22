@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.UI;
 
 
 [System.Serializable]
@@ -12,8 +12,7 @@ public class Tile : MonoBehaviour
     public int x, y, f, g, h, cost;
     public Vector2 position;
     public Tile parent;
-
-
+    public Text costText;
 
     public override bool Equals(object other)
     {
@@ -57,6 +56,15 @@ public class Tile : MonoBehaviour
         f = g = h = 0;
         parent = null;
         position = new Vector2(x, y);
+        if(walkable)
+        costText = GetComponentInChildren<Canvas>().GetComponentInChildren<Text>();
+
+    }
+
+    void Update()
+    {
+        if(walkable)
+        costText.text = "" + cost;
     }
     public void ResetParent()
     {

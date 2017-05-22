@@ -27,6 +27,7 @@ public class MapEditorInspector : Editor
     SerializedObject mapObj;
     SerializedProperty SetData;
     SerializedProperty listData;
+    SerializedProperty mapLocked;
     DataMap data;
     TileSet mySet;
    
@@ -36,6 +37,7 @@ public class MapEditorInspector : Editor
     private List<string> prefabs;
     string tilepath;
     int oldindex = 0;
+    bool Locked = false;
 
     void OnEnable()
     {
@@ -45,7 +47,7 @@ public class MapEditorInspector : Editor
         mapData = mapObj.FindProperty("mapdata");
         SetData = mapObj.FindProperty("tileSet");
         listData = mapObj.FindProperty("TileList");
-        
+        mapLocked = mapObj.FindProperty("mapset");
         // GetTiles();
 
 
@@ -131,6 +133,11 @@ public class MapEditorInspector : Editor
         GUILayout.Label("Map Data");
         data = EditorGUILayout.ObjectField(mapData.objectReferenceValue, typeof(DataMap), true) as DataMap;
 
+        Locked = EditorGUILayout.Toggle("Map Locked",Locked );
+        if(Locked != editor.mapset)
+        {
+            editor.mapset = Locked;
+        }
 
 
 
