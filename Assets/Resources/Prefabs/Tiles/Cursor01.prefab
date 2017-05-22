@@ -24,6 +24,7 @@ GameObject:
   - component: {fileID: 23197029108242924}
   - component: {fileID: 114031956140267570}
   - component: {fileID: 65119419591806128}
+  - component: {fileID: 95070418301681546}
   m_Layer: 0
   m_Name: Cursor01
   m_TagString: Untagged
@@ -108,6 +109,23 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.8, y: 0.8, z: 0.5}
   m_Center: {x: 0, y: 0, z: -0.25}
+--- !u!95 &95070418301681546
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1925642757120890}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: b5f382f1fc8476c448099559535e84fb, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
 --- !u!114 &114031956140267570
 MonoBehaviour:
   m_ObjectHideFlags: 1

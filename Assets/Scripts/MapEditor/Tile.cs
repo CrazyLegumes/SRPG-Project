@@ -9,6 +9,7 @@ public class Tile : MonoBehaviour
 {
     public bool walkable;
     public bool start;
+    public BaseUnit occupant;
     public int x, y, f, g, h, cost;
     public Vector2 position;
     public Tile parent;
@@ -65,6 +66,17 @@ public class Tile : MonoBehaviour
     {
         if(walkable)
         costText.text = "" + cost;
+
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, Vector3.up, out hit, 2f))
+        {
+            if (hit.transform.GetComponent<BaseUnit>() != null)
+                occupant = hit.transform.GetComponent<BaseUnit>();
+
+
+        }
+        if (hit.transform == null)
+            occupant = null;
     }
     public void ResetParent()
     {

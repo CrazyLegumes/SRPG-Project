@@ -48,7 +48,7 @@ public class SelectUnit : BattleState
                 if(GameMachine.instance.cursor.highlighted != null)
                 {
                     GameMachine.instance.selectedUnit = GameMachine.instance.cursor.highlighted;
-                    if(GameMachine.instance.selectedUnit.active)
+                    if(GameMachine.instance.selectedUnit.active && GameMachine.instance.selectedUnit.team == BaseUnit.Team.allies)
                         GameMachine.instance.ChangeState<SelectMovement>();
                 }
                 break;

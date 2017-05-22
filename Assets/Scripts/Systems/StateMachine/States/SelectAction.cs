@@ -6,11 +6,13 @@ public class SelectAction : BattleState
 {
     BaseUnit unit;
 
+    
 
     public override void Enter()
     {
         base.Enter();
         unit = GameMachine.instance.selectedUnit;
+        GameMachine.instance.cursor.canMove = false;
     }
     protected override void OnFire(object sender, InputEvents<int> e)
     {

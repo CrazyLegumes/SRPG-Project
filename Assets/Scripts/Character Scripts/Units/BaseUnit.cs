@@ -4,7 +4,13 @@ using UnityEngine;
 
 [System.Serializable]
 public class BaseUnit : MonoBehaviour {
+    public enum Team
+    {
+        allies,
+        enemies,
+        //neutral //Questionable
 
+    }
     /*
         Unit Specifications:
         Move Range
@@ -23,6 +29,7 @@ public class BaseUnit : MonoBehaviour {
     public bool selected;
     public Vector3 cancelPos;
     public Material mat;
+    public Team team;
     //doot
 
     public PlayerPathing unitPathing;
@@ -31,6 +38,10 @@ public class BaseUnit : MonoBehaviour {
         active = true;
         unitPathing = GetComponent<PlayerPathing>();
         mat = GetComponent<Renderer>().material;
+        if (team == Team.allies)
+            mat.SetFloat("_enemy", 0);
+        else if (team == Team.enemies)
+            mat.SetFloat("_enemy", 1);
 	}
 	
 	// Update is called once per frame

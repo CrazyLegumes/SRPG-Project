@@ -51,7 +51,7 @@ public class Cursor : MonoBehaviour
     void OnTriggerEnter(Collider col)
     {
         Debug.Log(col.name);
-        if (col.GetComponent<BaseUnit>() != null)
+        if (col.GetComponent<BaseUnit>() != null && highlighted == null)
         {
             highlighted = col.GetComponent<BaseUnit>();
             if (highlighted.active)
@@ -65,6 +65,7 @@ public class Cursor : MonoBehaviour
         Debug.Log(GameMachine.instance.CurrentState);
         if (GameMachine.instance.CurrentState.ToString() != "SelectMovement")
         {
+            Debug.Log("Exit");
             highlighted.selected = false;
             highlighted = null;
         }
@@ -72,7 +73,7 @@ public class Cursor : MonoBehaviour
 
     void OnTriggerStay(Collider col)
     {
-        if (col.GetComponent<BaseUnit>() != null)
+        if (col.GetComponent<BaseUnit>() != null && highlighted == null)
         {
             highlighted = col.GetComponent<BaseUnit>();
             if (highlighted.active)

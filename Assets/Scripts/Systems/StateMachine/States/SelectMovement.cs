@@ -9,8 +9,11 @@ public class SelectMovement : BattleState
 
     public override void Enter()
     {
+        GameMachine.instance.cursor.canMove = true;
         base.Enter();
         unit = GameMachine.instance.selectedUnit;
+        unit.unitPathing.mypath.Clear();
+        GameMachine.instance.cursor.transform.position = new Vector3(unit.transform.position.x, 0.01f, unit.transform.position.z);
         Debug.Log(unit.name);
         ThreadQueue.StartThreadFunction(unit.unitPathing.FindMoveRange);
         //ThreadQueue.StartThreadFunction(unit.unitPathing.CheckTile);
@@ -36,13 +39,19 @@ public class SelectMovement : BattleState
         {
             case 0:
                 unit.cancelPos = unit.transform.position;
-                if (unit.unitPathing.mypath.Count != 0)
+                if (unit.unitPathing.mypath.Count != 0 && GameMachine.instance.mapobj.map[(int) GameMachine.instance.cursor.transform.position.z  *
+                    GameMachine.instance.mapobj.mapWidth + (int)GameMachine.instance.cursor.transform.position.x].occupant == null)
                 {
                     
                    
                     ThreadQueue.StartThreadFunction(unit.unitPathing.Path);
                     GameMachine.instance.ChangeState<SelectAction>();
 
+                }
+                if(unit.unitPathing.mypath.Count == 0)
+                {
+                    unit.unitPathing.DestroyRange();
+                    GameMachine.instance.ChangeState<SelectAction>();
                 }
                 break;
 

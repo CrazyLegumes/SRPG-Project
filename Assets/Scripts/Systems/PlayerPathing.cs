@@ -7,7 +7,7 @@ using System;
 public class PlayerPathing : MonoBehaviour
 {
 
-
+    BaseUnit myUnit;
     public Tile start;
     public bool pathing;
     bool cancel;
@@ -25,9 +25,11 @@ public class PlayerPathing : MonoBehaviour
     public List<Vector3> mypath;
     List<GameObject> inRangeObjs;
     List<GameObject> pathObjs;
+    List<GameObject> attObjs;
+    List<Tile> attRange;
 
     [SerializeField]
-    GameObject path, cursor, myRange;
+    GameObject path, cursor, myRange, attack;
 
     [SerializeField]
     Transform player, cursortran;
@@ -37,6 +39,7 @@ public class PlayerPathing : MonoBehaviour
     public Tile[] map;
     public Tile[] rangeMap;
 
+
     // Use this for initialization
     void Start()
     {
@@ -44,10 +47,11 @@ public class PlayerPathing : MonoBehaviour
         mypath = new List<Vector3>();
         inRangeObjs = new List<GameObject>();
         pathObjs = new List<GameObject>();
+        attObjs = new List<GameObject>();
         moveR = GetComponent<BaseUnit>().moveRange;
         AttR = GetComponent<BaseUnit>().attackRange;
         cancel = false;
-
+        myUnit = GetComponent<BaseUnit>();
 
         InputController.fireEvent += CancelAction;
 
@@ -135,27 +139,24 @@ public class PlayerPathing : MonoBehaviour
 
     }
 
-    public void FindMoveRange()
+
+    public void FindAttackRange(Tile middle)
     {
-        Thread.Sleep(20);
 
 
 
-        inRange = new List<Tile>();
 
 
-        int range = moveR;
-
-        int totalR = RecursiveRange(range);
-
+        int range = myUnit.attackRange;
         List<Tile> open = new List<Tile>();
+        List<Tile> rejected = new List<Tile>();
         bool done = false;
-        int tileCount = 0;
-
-        Tile center = GameMachine.instance.mapobj.map[(int)trackedPos.z * GameMachine.instance.mapobj.mapWidth + (int)trackedPos.x];
-        open.Add(center);
-        inRange.Add(center);//doo
         int repcount = 0;
+
+        Tile center = middle;
+        open.Add(center);
+
+
         while (open.Count > 0)
         {
             repcount++;
@@ -163,11 +164,30 @@ public class PlayerPathing : MonoBehaviour
             if (repcount >= GameMachine.instance.mapobj.mapdata.count)
                 break;
 
+
             Tile curr = open[0];
-            open.RemoveAt(0);
+            Debug.LogFormat("Checking Tile: {0}, {1}", curr.x, curr.y);
 
 
 
+
+            if (Range_AStar(center, curr, range, false, true, true))
+            {
+
+                open.Remove(curr);
+
+
+                attRange.Add(curr);//doo
+
+
+
+            }
+            else
+            {
+                rejected.Add(curr);
+                open.Remove(curr);
+
+            }
 
 
 
@@ -209,88 +229,175 @@ public class PlayerPathing : MonoBehaviour
 
 
 
-            if (!open.Contains(right) && right != null && Tile.Distance(center, right) * right.cost <= range)
+            List<Tile> adjs = new List<Tile>();
+            if (right != null && right.walkable)
+                adjs.Add(right);
+            if (left != null && left.walkable)
+                adjs.Add(left);
+            if (up != null && up.walkable)
+                adjs.Add(up);
+            if (down != null && down.walkable)
+                adjs.Add(down);
+
+
+            foreach (Tile a in adjs)
             {
-
-                open.Insert(0, right);
-
-                open.Add(right);
-                if (!inRange.Contains(right))
+                if ((attRange.Contains(a)) || rejected.Contains(a))
+                    continue;
+                else if (!open.Contains(a) && Tile.Distance(a, center) <= range && !rejected.Contains(a))
                 {
-                    tileCount += right.cost;
-                    if (right.walkable && Range_AStar(center, right, range))
-                        inRange.Add(right);
+                    open.Add(a);
                 }
-                //ClearParents();
-
-
             }
-
-            if (!open.Contains(left) && left != null && Tile.Distance(center, left) * left.cost <= range)
-            {
-
-                open.Insert(0, left);
-
-                if (!inRange.Contains(left))
-                {
-                    tileCount += left.cost;
-                    if (left.walkable && Range_AStar(center, left, range))
-                        inRange.Add(left);
-                }
-                //ClearParents();
-
-            }
-
-            if (!open.Contains(up) && up != null && Tile.Distance(center, up) * up.cost <= range)
-            {
-
-                open.Insert(0, up);
-                if (!inRange.Contains(up))
-                {
-                    tileCount += up.cost;
-                    if (up.walkable && Range_AStar(center, up, range))
-                        inRange.Add(up);
-                }
-                //ClearParents();
-
-            }
-
-            if (!open.Contains(down) && down != null && Tile.Distance(center, down) * down.cost <= range)
-            {
-
-
-                //
-
-                open.Insert(0, down);
-                if (!inRange.Contains(down))
-                {
-                    tileCount += down.cost;
-                    if (down.walkable && Range_AStar(center, down, range))
-                        inRange.Add(down);
-                }
-               // ClearParents();
-
-            }
-
-
+            // ClearParents();
 
             if (done)
                 break;
 
+        }
+
+        foreach (Tile curr in attRange)
+        {
+            if (!inRange.Contains(curr))
+            {
+                Action func = () =>
+                {
+
+
+                    attObjs.Add(Instantiate(attack, new Vector3(curr.x, .001f, curr.y), Quaternion.identity));
+
+
+                };
+
+                ThreadQueue.QueueAction(func);
+            }
+        }
 
 
 
 
+
+
+    }
+
+    public void FindMoveRange()
+    {
+        ClearParents();
+        Thread.Sleep(20);
+
+
+        inRange = new List<Tile>();
+
+
+        int range = moveR;
+
+        int totalR = RecursiveRange(range);
+
+        List<Tile> open = new List<Tile>();
+        bool done = false;
+
+        List<Tile> rejected = new List<Tile>();
+
+        Tile center = GameMachine.instance.mapobj.map[(int)trackedPos.z * GameMachine.instance.mapobj.mapWidth + (int)trackedPos.x];
+        open.Add(center);
+
+        int repcount = 0;
+        while (open.Count > 0)
+        {
+            repcount++;
+            /*
+            if (repcount >= GameMachine.instance.mapobj.mapdata.count)
+                break;*/
+
+            Tile curr = open[0];
+
+
+
+
+            if (Range_AStar(center, curr, range, true, false, false))
+            {
+
+                open.Remove(curr);
+                inRange.Add(curr);//doo
+
+            }
+            else
+            {
+                rejected.Add(curr);
+                open.Remove(curr);
+
+            }
+
+            Tile right = null;
+            Tile left = null;
+            Tile up = null;
+            Tile down = null;
+
+
+
+
+            try { right = GameMachine.instance.mapobj.map[(curr.y) * GameMachine.instance.mapobj.mapWidth + (curr.x + 1)]; }
+            catch (Exception e)
+            {
+                right = null;
+
+            }
+            try { left = GameMachine.instance.mapobj.map[(curr.y) * GameMachine.instance.mapobj.mapWidth + (curr.x - 1)]; }
+            catch (Exception e)
+            {
+                left = null;
+
+            }
+            try { up = GameMachine.instance.mapobj.map[(curr.y + 1) * GameMachine.instance.mapobj.mapWidth + (curr.x)]; }
+            catch (Exception e)
+            {
+                up = null;
+
+            }
+            try { down = GameMachine.instance.mapobj.map[(curr.y - 1) * GameMachine.instance.mapobj.mapWidth + (curr.x - 1)]; }
+            catch (Exception e)
+            {
+                down = null;
+
+            }
+
+
+            List<Tile> adjs = new List<Tile>();
+            if (right != null && right.walkable)
+                adjs.Add(right);
+            if (left != null && left.walkable)
+                adjs.Add(left);
+            if (up != null && up.walkable)
+                adjs.Add(up);
+            if (down != null && down.walkable)
+                adjs.Add(down);
+
+
+            foreach (Tile a in adjs)
+            {
+                if (inRange.Contains(a) || rejected.Contains(a))
+                    continue;
+                else if (!open.Contains(a) && Tile.Distance(a, center) <= range && !rejected.Contains(a))
+                {
+                    open.Add(a);
+                }
+            }
+            // ClearParents();
+
+            if (done)
+                break;
 
         }
-     //   ClearParents();
+        //   ClearParents();
 
 
         rangeMap = new Tile[GameMachine.instance.mapobj.mapdata.count];
+        attRange = new List<Tile>();
 
         foreach (Tile curr in inRange)
         {
             rangeMap[curr.y * GameMachine.instance.mapobj.mapWidth + curr.x] = curr;
+            // 
             Action func = () =>
             {
 
@@ -301,7 +408,11 @@ public class PlayerPathing : MonoBehaviour
             };
 
             ThreadQueue.QueueAction(func);
+            if (!attRange.Contains(curr))
+                FindAttackRange(curr);
         }
+
+
     }
 
 
@@ -309,7 +420,7 @@ public class PlayerPathing : MonoBehaviour
     {
         Thread.Sleep(100);
 
-        // ThreadQueue.StartThreadFunction(DestroyPath);
+        ThreadQueue.StartThreadFunction(DestroyPath);
         ThreadQueue.StartThreadFunction(DestroyRange);
         pathing = true;
 
@@ -318,7 +429,7 @@ public class PlayerPathing : MonoBehaviour
         {
 
             Vector3 dest = c;
-            dest.y = 0;
+            dest.y = pos.y;
 
 
             Vector3 desire = Vector3.Normalize(dest - pos) * 45 * .002f;
@@ -366,7 +477,9 @@ public class PlayerPathing : MonoBehaviour
 
             ThreadQueue.QueueAction(func);
         }
-
+        pos.x = Convert.ToInt32(pos.x);
+        pos.z = Convert.ToInt32(pos.z);
+        Thread.Sleep(10);
         mypath.Clear();
         ClearParents();
         pathing = false;
@@ -388,11 +501,11 @@ public class PlayerPathing : MonoBehaviour
     }
 
 
-    bool Range_AStar(Tile begin, Tile endTile, int range, bool data = false)
+    bool Range_AStar(Tile begin, Tile endTile, int range, bool data = false, bool attacking = false, bool ignoreCost = false)
     {
-        Debug.Log("Started");
 
-       // ClearParents();
+
+        // ClearParents();
 
         bool stop = false;
 
@@ -427,14 +540,14 @@ public class PlayerPathing : MonoBehaviour
                     break;
                 }
             }
-            
+
             /*
             if (data)
                 Debug.LogFormat("Lowest Tile Current Stats X: {0} Y: {1} G: {2} H: {3} F: {4}", current.x, current.y, current.g, current.h, current.f);
 */
             if (!check.Remove(current))
             {
-                Debug.LogFormat("Failed to Remove Tile at {0} , {1}, End Tile Was: {2} , {3} ", current.x, current.y, endTile.x, endTile.y);
+
 
                 return false;
 
@@ -482,13 +595,61 @@ public class PlayerPathing : MonoBehaviour
             }
 
             if (right != null && right.walkable)
-                adj.Add(right);
+            {
+                bool add = true;
+                if (!attacking && right.occupant != null && right.occupant.team != myUnit.team)
+                    add = false;
+
+                if (attacking && right.occupant != null && right.occupant.team != myUnit.team && right != endTile)
+                    add = false;
+
+                if (add)
+                    adj.Add(right);
+            }
+
+
             if (left != null && left.walkable)
-                adj.Add(left);
+            {
+                bool add = true;
+                if (!attacking && left.occupant != null && left.occupant.team != myUnit.team)
+                    add = false;
+
+                if (attacking && left.occupant != null && left.occupant.team != myUnit.team && left != endTile)
+                    add = false;
+
+                if (add)
+                    adj.Add(left);
+            }
+
+
             if (up != null && up.walkable)
-                adj.Add(up);
+            {
+
+                bool add = true;
+                if (!attacking && up.occupant != null && up.occupant.team != myUnit.team)
+                    add = false;
+
+                if (attacking && up.occupant != null && up.occupant.team != myUnit.team && up != endTile)
+                    add = false;
+
+                if (add)
+                    adj.Add(up);
+            }
+
+
             if (down != null && down.walkable)
-                adj.Add(down);
+            {
+                bool add = true;
+                if (!attacking && down.occupant != null && down.occupant.team != myUnit.team)
+                    add = false;
+                if (attacking && down.occupant != null && down.occupant.team != myUnit.team && down != endTile)
+                    add = false;
+                if (add)
+                    adj.Add(down);
+
+            }
+
+
 
 
             foreach (Tile e in adj)
@@ -496,7 +657,9 @@ public class PlayerPathing : MonoBehaviour
                 if (pathing.Contains(e))
                     continue;
 
-                int newCost = current.g + Tile.Distance(current, e) + e.cost;
+                int newCost = current.g + Tile.Distance(current, e);
+                if (!ignoreCost)
+                    newCost += e.cost;
                 if (newCost < e.g || !check.Contains(e))
                 {
                     e.g = newCost;
@@ -520,14 +683,16 @@ public class PlayerPathing : MonoBehaviour
         Tile me = pathing[0];
         int totalcost = 0;
 
+
         while (me.parent != null)
         {
-           
+
             trueList.Add(me);
-            totalcost += me.cost;
+            if (!ignoreCost)
+                totalcost += me.cost;
             me = me.parent;
         }
-        
+
 
 
         if (trueList.Count > range || totalcost > range)
@@ -718,7 +883,7 @@ public class PlayerPathing : MonoBehaviour
 
     public void DestroyPath()
     {
-        Thread.Sleep(5);
+        Thread.Sleep(2);
         foreach (GameObject a in pathObjs.ToArray())
         {
             Action destroy = () =>

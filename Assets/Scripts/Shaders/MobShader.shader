@@ -3,6 +3,7 @@
 		_Color("Color", Color) = (1,1,1,1)
 		[MaterialToggle] _highlight("Selected", Float) = 0
 		[MaterialToggle] _inactive("Inactive", Float) = 0
+		[MaterialToggle] _enemy("Enemy", Float) = 0
 		_MainTex("Albedo (RGB)", 2D) = "white" {}
 		_Glossiness("Smoothness", Range(0,1)) = 0.5
 		_Metallic("Metallic", Range(0,1)) = 0.0
@@ -29,6 +30,7 @@
 			fixed4 _Color;
 			float _inactive;
 			float _highlight;
+			float _enemy;
 
 			void surf(Input IN, inout SurfaceOutputStandard o) {
 				// Albedo comes from a texture tinted by color
@@ -37,8 +39,15 @@
 
 				float gray = (c.r * .2989f + c.g * .587f + c.b * .114f);
 				if (_highlight == 1) {
-					temp.r = abs(sin(_Time[1] * 2)) * _Color.r;
-					temp.g = abs(sin(_Time[1] * 2)) * _Color.g;
+
+					if (_enemy == 0) {
+						temp.r = abs(sin(_Time[1] * 2)) * _Color.r;
+						temp.g = abs(sin(_Time[1] * 2)) * _Color.g;
+					}
+					if(_enemy == 1) {
+						temp.g = abs(sin(_Time[1] * 2)) * _Color.g;
+						temp.b = abs(sin(_Time[1] * 2)) * _Color.b;
+					}
 				}
 				else if (_inactive == 1) {
 					temp = (.389, .1465, .4645, .2) * _Color;

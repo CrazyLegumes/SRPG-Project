@@ -6,15 +6,21 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: Mob2Material
-  m_Shader: {fileID: 4800000, guid: 2425cdcaf330c44418e87b9e7a0a18cf, type: 3}
-  m_ShaderKeywords: _EMISSION
+  m_Name: Attack
+  m_Shader: {fileID: 4800000, guid: ea1e2318cb488b5418373025b03555b0, type: 3}
+  m_ShaderKeywords: CANFADE_ON _EMISSION
   m_LightmapFlags: 1
   m_CustomRenderQueue: -1
   stringTagMap: {}
   m_SavedProperties:
     serializedVersion: 2
     m_TexEnvs:
+    - first:
+        name: Texture
+      second:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - first:
         name: _BumpMap
       second:
@@ -71,6 +77,9 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - first:
+        name: CanFade
+      second: 1
+    - first:
         name: _BumpScale
       second: 1
     - first:
@@ -118,19 +127,10 @@ Material:
     - first:
         name: _ZWrite
       second: 1
-    - first:
-        name: _enemy
-      second: 0
-    - first:
-        name: _highlight
-      second: 0
-    - first:
-        name: _inactive
-      second: 0
     m_Colors:
     - first:
         name: _Color
-      second: {r: 0.9632353, g: 0.035413038, b: 0.7840698, a: 1}
+      second: {r: 0.88235295, g: 0.30493078, b: 0.30493078, a: 0}
     - first:
         name: _EmissionColor
       second: {r: 0, g: 0, b: 0, a: 1}

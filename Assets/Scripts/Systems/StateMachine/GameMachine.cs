@@ -38,7 +38,7 @@ public class GameMachine : StateMachine
     public List<BaseUnit> units;
     public BaseUnit selectedUnit;
     public CameraFollow cam;
-
+    public string currState;
     [SerializeField]
     GameObject cursorObj;
 
@@ -67,7 +67,8 @@ public class GameMachine : StateMachine
     // Update is called once per frame
     void Update()
     {
-
+        if(CurrentState != null)
+        currState = CurrentState.ToString();
 
     }
 
