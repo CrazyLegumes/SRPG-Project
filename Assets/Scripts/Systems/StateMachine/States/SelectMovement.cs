@@ -42,8 +42,8 @@ public class SelectMovement : BattleState
                 if (unit.unitPathing.mypath.Count != 0 && GameMachine.instance.mapobj.map[(int) GameMachine.instance.cursor.transform.position.z  *
                     GameMachine.instance.mapobj.mapWidth + (int)GameMachine.instance.cursor.transform.position.x].occupant == null)
                 {
-                    
-                   
+
+
                     ThreadQueue.StartThreadFunction(unit.unitPathing.Path);
                     GameMachine.instance.ChangeState<SelectAction>();
 
@@ -51,6 +51,8 @@ public class SelectMovement : BattleState
                 if(unit.unitPathing.mypath.Count == 0)
                 {
                     unit.unitPathing.DestroyRange();
+
+                    ThreadQueue.StartThreadFunction(unit.unitPathing.FindAttackRange);
                     GameMachine.instance.ChangeState<SelectAction>();
                 }
                 break;

@@ -26,7 +26,7 @@ public class PlayerPathing : MonoBehaviour
     List<GameObject> inRangeObjs;
     List<GameObject> pathObjs;
     List<GameObject> attObjs;
-    List<Tile> attRange;
+    public List<Tile> attRange;
 
     [SerializeField]
     GameObject path, cursor, myRange, attack;
@@ -140,20 +140,21 @@ public class PlayerPathing : MonoBehaviour
     }
 
 
-    public void FindAttackRange(Tile middle)
+    public void FindAttackRange()
     {
 
+        Thread.Sleep(20);
 
 
 
-
-        int range = myUnit.attackRange;
+        int range = myUnit.maxARange;
         List<Tile> open = new List<Tile>();
         List<Tile> rejected = new List<Tile>();
         bool done = false;
         int repcount = 0;
 
-        Tile center = middle;
+        Tile center = GameMachine.instance.mapobj.map[(int)trackedPos.z * GameMachine.instance.mapobj.mapWidth + (int)trackedPos.x];
+
         open.Add(center);
 
 
@@ -166,18 +167,24 @@ public class PlayerPathing : MonoBehaviour
 
 
             Tile curr = open[0];
-            Debug.LogFormat("Checking Tile: {0}, {1}", curr.x, curr.y);
+            
 
 
 
 
-            if (Range_AStar(center, curr, range, false, true, true))
+            if (Range_AStar(center, curr, range, false, true, true, true)) 
             {
+
+                if (curr.walkable && Tile.Distance(center, curr) >= myUnit.minARange && Tile.Distance(center, curr) <= myUnit.maxARange)
+                    attRange.Add(curr);//doo
+
+                else
+                    rejected.Add(curr);
 
                 open.Remove(curr);
 
 
-                attRange.Add(curr);//doo
+               
 
 
 
@@ -230,13 +237,13 @@ public class PlayerPathing : MonoBehaviour
 
 
             List<Tile> adjs = new List<Tile>();
-            if (right != null && right.walkable)
+            if (right != null)
                 adjs.Add(right);
-            if (left != null && left.walkable)
+            if (left != null )
                 adjs.Add(left);
-            if (up != null && up.walkable)
+            if (up != null)
                 adjs.Add(up);
-            if (down != null && down.walkable)
+            if (down != null)
                 adjs.Add(down);
 
 
@@ -244,7 +251,7 @@ public class PlayerPathing : MonoBehaviour
             {
                 if ((attRange.Contains(a)) || rejected.Contains(a))
                     continue;
-                else if (!open.Contains(a) && Tile.Distance(a, center) <= range && !rejected.Contains(a))
+                else if (!open.Contains(a) &&Tile.Distance(center, a) <= myUnit.maxARange && !rejected.Contains(a))
                 {
                     open.Add(a);
                 }
@@ -258,8 +265,7 @@ public class PlayerPathing : MonoBehaviour
 
         foreach (Tile curr in attRange)
         {
-            if (!inRange.Contains(curr))
-            {
+            
                 Action func = () =>
                 {
 
@@ -268,9 +274,13 @@ public class PlayerPathing : MonoBehaviour
 
 
                 };
+            if(curr.occupant != null && curr.occupant.team != myUnit.team)
+            {
+                myUnit.targetList.Add(curr.occupant);
+            }
 
                 ThreadQueue.QueueAction(func);
-            }
+            
         }
 
 
@@ -403,15 +413,18 @@ public class PlayerPathing : MonoBehaviour
 
 
                 inRangeObjs.Add(Instantiate(myRange, new Vector3(curr.x, .001f, curr.y), Quaternion.identity));
+                
 
 
             };
+            
 
             ThreadQueue.QueueAction(func);
-            if (!attRange.Contains(curr))
-                FindAttackRange(curr);
+            
+            
         }
 
+       
 
     }
 
@@ -451,7 +464,7 @@ public class PlayerPathing : MonoBehaviour
 
 
             }
-            pos = new Vector3(Mathf.RoundToInt(pos.x), pos.y, Mathf.RoundToInt(pos.z));
+            pos = new Vector3(dest.x, pos.y,dest.z);
             Debug.Log(GameMachine.instance.CurrentState);
             if (cancel)
                 break;
@@ -465,11 +478,13 @@ public class PlayerPathing : MonoBehaviour
         if (cancel)
         {
             ThreadQueue.StartThreadFunction(DestroyPath);
+            //ThreadQueue.StartThreadFunction(DestroyAttackTile);
+           // attRange.Clear();
             Action func = () =>
             {
                 pathing = false;
                 transform.position = GetComponent<BaseUnit>().cancelPos;
-                cancel = false;
+                
                 GameMachine.instance.ChangeState<SelectMovement>();
 
 
@@ -479,11 +494,14 @@ public class PlayerPathing : MonoBehaviour
         }
         pos.x = Convert.ToInt32(pos.x);
         pos.z = Convert.ToInt32(pos.z);
-        Thread.Sleep(10);
+        Thread.Sleep(20);
         mypath.Clear();
         ClearParents();
         pathing = false;
+        if(!cancel)
+            ThreadQueue.StartThreadFunction(FindAttackRange);
 
+        cancel = false;
         //ThreadQueue.StartThreadFunction(FindRange);
         // start = mapobj.map[(int)pos.x, (int)pos.z];
     }
@@ -501,7 +519,7 @@ public class PlayerPathing : MonoBehaviour
     }
 
 
-    bool Range_AStar(Tile begin, Tile endTile, int range, bool data = false, bool attacking = false, bool ignoreCost = false)
+    bool Range_AStar(Tile begin, Tile endTile, int range, bool data = false, bool attacking = false, bool ignoreCost = false, bool ignoreWalls = false)
     {
 
 
@@ -594,9 +612,12 @@ public class PlayerPathing : MonoBehaviour
 
             }
 
-            if (right != null && right.walkable)
+            if (right != null)
             {
                 bool add = true;
+                if (!ignoreWalls && !right.walkable)
+                    add = false;
+
                 if (!attacking && right.occupant != null && right.occupant.team != myUnit.team)
                     add = false;
 
@@ -608,9 +629,12 @@ public class PlayerPathing : MonoBehaviour
             }
 
 
-            if (left != null && left.walkable)
+            if (left != null)
             {
                 bool add = true;
+
+                if (!ignoreWalls && !left.walkable)
+                    add = false;
                 if (!attacking && left.occupant != null && left.occupant.team != myUnit.team)
                     add = false;
 
@@ -622,10 +646,13 @@ public class PlayerPathing : MonoBehaviour
             }
 
 
-            if (up != null && up.walkable)
+            if (up != null)
             {
 
                 bool add = true;
+
+                if (!ignoreWalls && !up.walkable)
+                    add = false;
                 if (!attacking && up.occupant != null && up.occupant.team != myUnit.team)
                     add = false;
 
@@ -637,9 +664,12 @@ public class PlayerPathing : MonoBehaviour
             }
 
 
-            if (down != null && down.walkable)
+            if (down != null)
             {
                 bool add = true;
+
+                if (!ignoreWalls && !down.walkable)
+                    add = false;
                 if (!attacking && down.occupant != null && down.occupant.team != myUnit.team)
                     add = false;
                 if (attacking && down.occupant != null && down.occupant.team != myUnit.team && down != endTile)
@@ -904,6 +934,20 @@ public class PlayerPathing : MonoBehaviour
             };
             ThreadQueue.QueueAction(destroy);
         }
+    }
+
+    public void DestroyAttackTile()
+    {
+        foreach(GameObject a in attObjs.ToArray())
+        {
+            Action destroy = () =>
+            {
+                Destroy(a);
+            };
+
+            ThreadQueue.QueueAction(destroy);
+        }
+        myUnit.targetList.Clear();
     }
 
     void DrawPath()

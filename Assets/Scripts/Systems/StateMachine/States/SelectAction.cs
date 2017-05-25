@@ -12,6 +12,7 @@ public class SelectAction : BattleState
     {
         base.Enter();
         unit = GameMachine.instance.selectedUnit;
+        
         GameMachine.instance.cursor.canMove = false;
     }
     protected override void OnFire(object sender, InputEvents<int> e)
@@ -36,6 +37,7 @@ public class SelectAction : BattleState
                 {
                     unit.transform.position = unit.cancelPos;
                     ThreadQueue.StartThreadFunction(unit.unitPathing.DestroyPath);
+                    ThreadQueue.StartThreadFunction(unit.unitPathing.DestroyAttackTile);
                     GameMachine.instance.ChangeState<SelectMovement>();
                 }
                 break;

@@ -1,0 +1,52 @@
+﻿{
+  "UseItems": [
+    {
+
+    }
+  ],
+
+  "Weapons": [
+    {
+      "id": 0,
+      "name": "Short Sword",
+      "minRange": 1,
+      "maxRange": 1,
+      "type": 0,
+      "damage": 2
+
+
+
+    },
+    {
+      "id": 1,
+      "name": "Worn Axe",
+      "minRange": 1,
+      "maxRange": 1,
+      "type": 1,
+      "damage": 3
+
+    },
+    {
+      "id": 2,
+      "name": "Basic Spear",
+      "minRange": 1,
+      "maxRange": 1,
+      "type": 2,
+      "damage": 2
+    },
+    {
+      "id": 3,
+      "name": "Wooden Bow",
+      "minRange": 2,
+      "maxRange": 2,
+      "type": 3,
+      "damage": 1
+
+    }
+  ],
+  "Staves": [
+    {
+
+    }
+  ]
+}
