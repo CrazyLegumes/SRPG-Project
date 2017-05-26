@@ -9,6 +9,7 @@ public class BaseItem  {
     public int id;
     public string itemname;
     public string itemtype;
+    public Sprite sprite;
 
 
     // Use this for initialization

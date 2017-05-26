@@ -263,6 +263,8 @@ public class PlayerPathing : MonoBehaviour
 
         }
 
+
+        attRange.Remove(center);
         foreach (Tile curr in attRange)
         {
             

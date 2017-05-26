@@ -57,6 +57,20 @@ public class BaseWeapon : BaseItem
             maxRange = int.Parse(myData["maxRange"].ToString());
             baseDamage = int.Parse(myData["damage"].ToString());
             type = (weaponType)int.Parse(myData["type"].ToString());
+            switch (type)
+            {
+                case weaponType.axe:
+                    sprite = Resources.Load<Sprite>("Art/UIStuff/AxeIcon");
+                    break;
+                case weaponType.sword:
+                    sprite = Resources.Load<Sprite>("Art/UIStuff/SwordIcon");
+                    break;
+                case weaponType.spear:
+                    sprite = Resources.Load<Sprite>("Art/UISuff/PolearmIcon");
+                    break;
+                default:
+                    break;
+            }
         }
 
 

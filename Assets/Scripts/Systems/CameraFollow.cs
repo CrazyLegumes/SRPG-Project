@@ -22,7 +22,7 @@ public class CameraFollow : MonoBehaviour {
 	void Update () {
         if (target != null && following)
         {
-            transform.position = Vector3.Lerp(transform.position, target.position + offset, 3 * Time.deltaTime);
+            transform.position = Vector3.Lerp(transform.position, target.position + offset, 6 * Time.deltaTime);
         }
 
         
