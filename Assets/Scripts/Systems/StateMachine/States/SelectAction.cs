@@ -5,6 +5,7 @@ using UnityEngine;
 public class SelectAction : BattleState
 {
     BaseUnit unit;
+    UnitUI ui;
 
     
 
@@ -12,8 +13,16 @@ public class SelectAction : BattleState
     {
         base.Enter();
         unit = GameMachine.instance.selectedUnit;
-        
+        ui = unit.GetComponent<UnitUI>();
         GameMachine.instance.cursor.canMove = false;
+
+        ui.ShowOptions();
+    }
+
+    protected override void OnMove(object sender, InputEvents<Vector3> e)
+    {
+        base.OnMove(sender, e);
+        
     }
     protected override void OnFire(object sender, InputEvents<int> e)
     {

@@ -10,6 +10,7 @@ public class UnitUI : MonoBehaviour {
     public GameObject optionsMenu;
     public GameObject inventoryMenu;
     public BaseUnit myunit;
+    public Image cursor;
     bool attackDisabled;
 
     string[] options = { "Attack", "Items", "Stay", "Cancel" };
@@ -24,7 +25,7 @@ public class UnitUI : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        selected = options[optionID];
+        
 	}
 
     public void ShowOptions()
