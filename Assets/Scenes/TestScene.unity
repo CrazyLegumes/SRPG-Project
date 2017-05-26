@@ -1579,6 +1579,36 @@ Prefab:
       propertyPath: m_RootOrder
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 114846627729357016, guid: 87be380c5efef934a98459d139109b0b,
+        type: 2}
+      propertyPath: m_FontData.m_Font
+      value: 
+      objectReference: {fileID: 12800000, guid: 756cefa0f255b3a4bb37e7458352f01e,
+        type: 3}
+    - target: {fileID: 114161839501954386, guid: 87be380c5efef934a98459d139109b0b,
+        type: 2}
+      propertyPath: m_FontData.m_Font
+      value: 
+      objectReference: {fileID: 12800000, guid: 756cefa0f255b3a4bb37e7458352f01e,
+        type: 3}
+    - target: {fileID: 114261818331590258, guid: 87be380c5efef934a98459d139109b0b,
+        type: 2}
+      propertyPath: m_FontData.m_Font
+      value: 
+      objectReference: {fileID: 12800000, guid: 756cefa0f255b3a4bb37e7458352f01e,
+        type: 3}
+    - target: {fileID: 114712998107765222, guid: 87be380c5efef934a98459d139109b0b,
+        type: 2}
+      propertyPath: m_FontData.m_Font
+      value: 
+      objectReference: {fileID: 12800000, guid: 756cefa0f255b3a4bb37e7458352f01e,
+        type: 3}
+    - target: {fileID: 114172685047586226, guid: 87be380c5efef934a98459d139109b0b,
+        type: 2}
+      propertyPath: m_FontData.m_Font
+      value: 
+      objectReference: {fileID: 12800000, guid: 756cefa0f255b3a4bb37e7458352f01e,
+        type: 3}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 87be380c5efef934a98459d139109b0b, type: 2}
   m_IsPrefabParent: 0
@@ -2152,7 +2182,11 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1816317550637468, guid: 87be380c5efef934a98459d139109b0b, type: 2}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1173161528767054, guid: 87be380c5efef934a98459d139109b0b, type: 2}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 87be380c5efef934a98459d139109b0b, type: 2}
