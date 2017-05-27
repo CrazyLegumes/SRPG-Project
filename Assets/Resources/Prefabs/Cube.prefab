@@ -498,7 +498,7 @@ MonoBehaviour:
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_Font: {fileID: 12800000, guid: 756cefa0f255b3a4bb37e7458352f01e, type: 3}
     m_FontSize: 14
     m_FontStyle: 1
     m_BestFit: 0
@@ -558,7 +558,7 @@ MonoBehaviour:
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_Font: {fileID: 12800000, guid: 756cefa0f255b3a4bb37e7458352f01e, type: 3}
     m_FontSize: 14
     m_FontStyle: 1
     m_BestFit: 0
@@ -591,7 +591,7 @@ MonoBehaviour:
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_Font: {fileID: 12800000, guid: 756cefa0f255b3a4bb37e7458352f01e, type: 3}
     m_FontSize: 14
     m_FontStyle: 1
     m_BestFit: 0
@@ -854,6 +854,16 @@ MonoBehaviour:
   inventoryMenu: {fileID: 1173161528767054}
   myunit: {fileID: 0}
   cursor: {fileID: 114314536738598960}
+  textOptionPrefab: {fileID: 1432866289675886, guid: 9a9816d802d636c4dac53527c2589e27,
+    type: 2}
+  OptionBackgroundPrefab: {fileID: 1594981732095264, guid: 4b06433d886d08a4fbba4128f58e0ffd,
+    type: 2}
+  selectedItem:
+    id: 0
+    itemname: 
+    itemtype: 
+    sprite: {fileID: 0}
+    actions: 
   inventory:
   - {fileID: 114169558651579358}
   - {fileID: 114669302413519648}
@@ -912,12 +922,14 @@ MonoBehaviour:
     itemname: 
     itemtype: 
     sprite: {fileID: 0}
+    actions: 
     minRange: 0
     maxRange: 0
     baseDamage: 0
     type: 0
   inventory: []
   targetList: []
+  equippable: 01000000
   team: 0
   unitPathing: {fileID: 0}
 --- !u!114 &114712998107765222
@@ -940,7 +952,7 @@ MonoBehaviour:
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_Font: {fileID: 12800000, guid: 756cefa0f255b3a4bb37e7458352f01e, type: 3}
     m_FontSize: 14
     m_FontStyle: 1
     m_BestFit: 0
@@ -1052,7 +1064,7 @@ MonoBehaviour:
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_Font: {fileID: 12800000, guid: 756cefa0f255b3a4bb37e7458352f01e, type: 3}
     m_FontSize: 14
     m_FontStyle: 1
     m_BestFit: 0
@@ -1225,16 +1237,16 @@ RectTransform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1192262135980248}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 2.842171e-14}
-  m_LocalScale: {x: 0.8, y: 0.8, z: 0}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.8000001, y: 0.8000011, z: 0}
   m_Children: []
-  m_Father: {fileID: 224775576093487316}
-  m_RootOrder: 4
+  m_Father: {fileID: 224159857034831156}
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -2.0000007, y: 0.7}
+  m_AnchoredPosition: {x: -1.5, y: 0.7}
   m_SizeDelta: {x: 1, y: 1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &224154301534788970
@@ -1267,6 +1279,7 @@ RectTransform:
   m_Children:
   - {fileID: 224775576093487316}
   - {fileID: 224179351751420932}
+  - {fileID: 224110715930883000}
   m_Father: {fileID: 4836151352097954}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
@@ -1534,7 +1547,6 @@ RectTransform:
   - {fileID: 224154301534788970}
   - {fileID: 224498671536693596}
   - {fileID: 224396117236910848}
-  - {fileID: 224110715930883000}
   m_Father: {fileID: 224159857034831156}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

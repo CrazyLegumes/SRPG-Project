@@ -500,8 +500,7 @@ public class PlayerPathing : MonoBehaviour
         mypath.Clear();
         ClearParents();
         pathing = false;
-        if(!cancel)
-            ThreadQueue.StartThreadFunction(FindAttackRange);
+        
 
         cancel = false;
         //ThreadQueue.StartThreadFunction(FindRange);

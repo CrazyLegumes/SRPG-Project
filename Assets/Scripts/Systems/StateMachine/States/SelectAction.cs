@@ -17,6 +17,7 @@ public class SelectAction : BattleState
         unit = GameMachine.instance.selectedUnit;
         ui = unit.GetComponent<UnitUI>();
         GameMachine.instance.cursor.canMove = false;
+        unit.unitPathing.DestroyAttackTile();
 
         StartCoroutine(WaitForPathing());
     }
@@ -24,7 +25,7 @@ public class SelectAction : BattleState
 
     IEnumerator WaitForPathing()
     {
-        yield return new WaitForSeconds(.5f);
+        yield return new WaitForSeconds(.1f);
         while (unit.unitPathing.pathing)
         {
             yield return null;
@@ -32,6 +33,7 @@ public class SelectAction : BattleState
 
         ui.ShowOptions();
         canselect = true;
+        unit.unitPathing.FindAttackRange();
     }
 
     protected override void OnMove(object sender, InputEvents<Vector3> e)
@@ -52,17 +54,47 @@ public class SelectAction : BattleState
                 case 0:
                     if (!unit.unitPathing.pathing)
                     {
-                        ThreadQueue.StartThreadFunction(unit.unitPathing.DestroyPath);
-                        unit.active = false;
-                        GameMachine.instance.selectedUnit.selected = false;
-                        GameMachine.instance.selectedUnit = null;
-                        GameMachine.instance.ChangeState<SelectUnit>();
+
+                        switch (ui.selected)
+                        {
+                            case "Attack":
+                                if (unit.unitPathing.attRange.Count > 0)
+                                    GameMachine.instance.ChangeState<SelectTarget>();
+                                break;
+                            case "Items":
+                                GameMachine.instance.ChangeState<SelectItem>();
+                                break;
+                            case "Stay":
+                                ui.HideAll();
+                                ThreadQueue.StartThreadFunction(unit.unitPathing.DestroyPath);
+                                unit.active = false;
+                                GameMachine.instance.selectedUnit.selected = false;
+                                GameMachine.instance.selectedUnit = null;
+                                GameMachine.instance.ChangeState<SelectUnit>();
+                                break;
+
+                            case "Cancel":
+                                ui.HideAll();
+                                unit.transform.position = unit.cancelPos;
+                                ThreadQueue.StartThreadFunction(unit.unitPathing.DestroyPath);
+                                ThreadQueue.StartThreadFunction(unit.unitPathing.DestroyAttackTile);
+                                ui.HideAll();
+                                GameMachine.instance.ChangeState<SelectMovement>();
+                                break;
+
+                            default:
+                                break;
+
+
+
+                        }
 
                     }
                     break;
                 case 1:
                     if (!unit.unitPathing.pathing)
                     {
+                        ui.HideAll();
                         unit.transform.position = unit.cancelPos;
                         ThreadQueue.StartThreadFunction(unit.unitPathing.DestroyPath);
                         ThreadQueue.StartThreadFunction(unit.unitPathing.DestroyAttackTile);

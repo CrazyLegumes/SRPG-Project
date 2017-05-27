@@ -12,6 +12,7 @@ public class BaseUnit : MonoBehaviour
         //neutral //Questionable
 
     }
+    
     /*
         Unit Specifications:
         Move Range
@@ -35,6 +36,7 @@ public class BaseUnit : MonoBehaviour
     public BaseWeapon equipped;
     public List<BaseItem> inventory;
     public List<BaseUnit> targetList;
+    public List<BaseWeapon.weaponType> equippable = new List<BaseWeapon.weaponType>();
     public Team team;
     //doot
 
@@ -42,12 +44,14 @@ public class BaseUnit : MonoBehaviour
 
     void Start()
     {
+        
+        
         targetList = new List<BaseUnit>();
         inventory = new List<BaseItem>();
         bool found = false;
         for (int i = 0; i < inventory.Count; i++)
         {
-            if (inventory[i] != null && inventory[i].itemtype == "Weapons")
+            if (inventory[i] != null && inventory[i].itemtype == "Weapons" && equippable.Contains(((BaseWeapon)inventory[i]).type))
             {
                 equipped = (BaseWeapon)inventory[i];
                 found = true;
@@ -57,6 +61,7 @@ public class BaseUnit : MonoBehaviour
             equipped = null;
 
         AddItem("Weapons", 1);
+        AddItem("Weapons", 0);
 
 
         if (equipped == null)

@@ -44,7 +44,9 @@ public class BaseWeapon : BaseItem
     // Use this for initialization
     public BaseWeapon(int idnum)
     {
-
+        actions = new List<Options>();
+        actions.Add(Options.equip);
+        actions.Add(Options.discard);
         id = idnum;
 
         myData = JsonReader.RetrieveItemInfo("Weapons", id);
