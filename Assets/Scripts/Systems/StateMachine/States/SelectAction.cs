@@ -58,8 +58,22 @@ public class SelectAction : BattleState
                         switch (ui.selected)
                         {
                             case "Attack":
+
                                 if (unit.unitPathing.attRange.Count > 0)
-                                    GameMachine.instance.ChangeState<SelectTarget>();
+                                {
+                                    bool enemies = false;
+                                    for (int i = 0; i < unit.unitPathing.attRange.Count; i++)
+                                    {
+                                        if (unit.unitPathing.attRange[i].occupant != null && unit.unitPathing.attRange[i].occupant.team == BaseUnit.Team.enemies)
+                                        {
+                                            enemies = true;
+                                            break;
+                                        }
+                                    }
+                                    if (enemies)
+                                        GameMachine.instance.ChangeState<SelectTarget>();
+                                }
+
                                 break;
                             case "Items":
                                 GameMachine.instance.ChangeState<SelectItem>();

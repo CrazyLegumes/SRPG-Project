@@ -11,7 +11,13 @@ public class BaseWeapon : BaseItem
         sword,
         axe,
         spear,
-        bow
+        bow,
+        tome
+    }
+    public enum damageType
+    {
+        Phyiscal,
+        Magical
     }
 
 
@@ -35,6 +41,9 @@ public class BaseWeapon : BaseItem
     
     [SerializeField]
     public weaponType type;
+
+    [SerializeField]
+    public damageType dtype;
 
     public JsonData myData;
   
@@ -69,6 +78,17 @@ public class BaseWeapon : BaseItem
                     break;
                 case weaponType.spear:
                     sprite = Resources.Load<Sprite>("Art/UISuff/PolearmIcon");
+                    break;
+                default:
+                    break;
+            }
+            switch (myData["damagetype"].ToString())
+            {
+                case "Phyiscal":
+                    dtype = damageType.Phyiscal;
+                    break;
+                case "Magical":
+                    dtype = damageType.Magical;
                     break;
                 default:
                     break;

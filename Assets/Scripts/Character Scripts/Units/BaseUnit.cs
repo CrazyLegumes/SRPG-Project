@@ -12,7 +12,7 @@ public class BaseUnit : MonoBehaviour
         //neutral //Questionable
 
     }
-    
+
     /*
         Unit Specifications:
         Move Range
@@ -21,14 +21,27 @@ public class BaseUnit : MonoBehaviour
 
 
         -------Stats-------
+        Level - LV
+        Health - HP
+        Strength - STR 
+        Endurance - END
+        Intelligence - INT
+        Resolve - RES
+        Agility - AGI
+        Luck - LUK
 
     */
 
+
+    public int LV, HP, MHP, STR, END, INT, RES, AGI, LUK;
 
     public int moveRange;
     public int attackRange;
     public int minARange;
     public int maxARange;
+
+
+
     public bool active;
     public bool selected;
     public Vector3 cancelPos;
@@ -44,8 +57,8 @@ public class BaseUnit : MonoBehaviour
 
     void Start()
     {
-        
-        
+
+        HP = MHP;
         targetList = new List<BaseUnit>();
         inventory = new List<BaseItem>();
         bool found = false;

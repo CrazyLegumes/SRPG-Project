@@ -854,10 +854,13 @@ MonoBehaviour:
   inventoryMenu: {fileID: 1173161528767054}
   myunit: {fileID: 0}
   cursor: {fileID: 114314536738598960}
+  selectingItem: 0
   textOptionPrefab: {fileID: 1432866289675886, guid: 9a9816d802d636c4dac53527c2589e27,
     type: 2}
   OptionBackgroundPrefab: {fileID: 1594981732095264, guid: 4b06433d886d08a4fbba4128f58e0ffd,
     type: 2}
+  optionback: {fileID: 0}
+  optiontext: []
   selectedItem:
     id: 0
     itemname: 
@@ -909,6 +912,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 706db2d20c09c1f4b9eb01cae8ea5533, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  LV: 1
+  HP: 0
+  MHP: 10
+  STR: 4
+  END: 4
+  INT: 3
+  RES: 3
+  AGI: 3
+  LUK: 5
   moveRange: 4
   attackRange: 1
   minARange: 1
@@ -927,6 +939,7 @@ MonoBehaviour:
     maxRange: 0
     baseDamage: 0
     type: 0
+    dtype: 0
   inventory: []
   targetList: []
   equippable: 01000000
@@ -1210,7 +1223,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
-  m_SortingLayerID: 0
+  m_SortingLayerID: -587460025
   m_SortingOrder: 0
   m_TargetDisplay: 0
 --- !u!224 &224060352967033474
@@ -1302,8 +1315,8 @@ RectTransform:
   - {fileID: 224653662549182802}
   - {fileID: 224572908548977940}
   - {fileID: 224198575183323212}
-  - {fileID: 224691645721411838}
   - {fileID: 224545004286988978}
+  - {fileID: 224691645721411838}
   m_Father: {fileID: 224159857034831156}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1397,7 +1410,7 @@ RectTransform:
   m_Children:
   - {fileID: 224060352967033474}
   m_Father: {fileID: 224179351751420932}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -1490,7 +1503,7 @@ RectTransform:
   m_Children:
   - {fileID: 224890944610314552}
   m_Father: {fileID: 224179351751420932}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
